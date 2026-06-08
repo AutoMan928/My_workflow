@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}资讯平台{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white border-b px-6 py-3 flex items-center gap-4 text-sm sticky top-0 z-10 shadow-sm">
+    <a href="/" class="font-bold text-base">📰 资讯</a>
+    <a href="/category/banking" class="text-gray-600 hover:text-gray-900">银行运营</a>
+    <a href="/category/tech" class="text-gray-600 hover:text-gray-900">技术AI</a>
+    <a href="/category/startup" class="text-gray-600 hover:text-gray-900">创业</a>
+    <a href="/search" class="text-gray-600 hover:text-gray-900">🔍 搜索</a>
+    <a href="/archive" class="text-gray-600 hover:text-gray-900">📅 归档</a>
+    <div class="ml-auto flex gap-4">
+      <a href="/admin/sources" class="text-gray-400 hover:text-gray-600">⚙️</a>
+      <a href="/logout" class="text-gray-400 hover:text-gray-600">退出</a>
+    </div>
+  </nav>
+  <main class="max-w-4xl mx-auto px-4 py-6">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
