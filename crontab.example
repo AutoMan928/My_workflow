@@ -1,0 +1,8 @@
+# 个人资讯平台定时任务
+# 安装方法: crontab -e 然后粘贴以下行（修改路径和 python 路径）
+
+# 早间 9:00 — 全部类别（银行/技术/创业）
+0 9 * * * cd /opt/news-platform && /opt/news-platform/.venv/bin/python -m app.run --slot morning --category all >> /var/log/news-platform/morning.log 2>&1
+
+# 晚间 19:00 — 仅银行类别
+0 19 * * * cd /opt/news-platform && /opt/news-platform/.venv/bin/python -m app.run --slot evening --category banking >> /var/log/news-platform/evening.log 2>&1
