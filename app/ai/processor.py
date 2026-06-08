@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 from app.ai.banking import process_banking_batch
 from app.ai.tech import process_tech_batch
