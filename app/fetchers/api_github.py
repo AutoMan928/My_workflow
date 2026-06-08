@@ -1,7 +1,6 @@
 import logging
 import os
 import httpx
-from typing import Optional
 from app.fetchers.base import BaseFetcher, RawItem
 
 logger = logging.getLogger(__name__)

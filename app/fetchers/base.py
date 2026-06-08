@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
 
 from app.config import SourceConfig
 
@@ -11,7 +10,7 @@ class RawItem:
     title: str
     url: str
     raw_text: str = ""
-    published_at: Optional[datetime] = None
+    published_at: datetime | None = None
     extra: dict = field(default_factory=dict)
 
 

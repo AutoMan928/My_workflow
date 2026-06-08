@@ -1,6 +1,5 @@
 import logging
 from urllib.parse import urlparse, urljoin
-from typing import Optional
 from app.fetchers.base import BaseFetcher, RawItem
 
 logger = logging.getLogger(__name__)
