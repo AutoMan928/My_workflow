@@ -9,6 +9,7 @@ import pytest
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 from starlette.testclient import TestClient
 
 from app.models.base import Base, get_db
@@ -16,7 +17,11 @@ from app.models.item import Item
 from app.models.push_log import PushLog
 
 # ── 共享测试数据库 ─────────────────────────────────────────────────────────────
-_engine = create_engine("sqlite:///:memory:")
+_engine = create_engine(
+    "sqlite:///:memory:",
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
 Base.metadata.create_all(_engine)
 _Session = sessionmaker(bind=_engine)
 
@@ -106,3 +111,27 @@ def test_login_correct_password(anon):
 def test_logout(authed):
     resp = authed.get("/logout", follow_redirects=False)
     assert resp.status_code == 302
+
+
+# ── Task 2: Home 测试 ──────────────────────────────────────────────────────────
+def test_home_200(authed):
+    resp = authed.get("/")
+    assert resp.status_code == 200
+
+
+def test_home_shows_three_sections(authed):
+    resp = authed.get("/")
+    assert "银行用户运营" in resp.text
+    assert "技术与AI工具" in resp.text
+    assert "个人创业" in resp.text
+
+
+def test_home_shows_seeded_items(authed):
+    resp = authed.get("/")
+    assert "银行降息公告" in resp.text
+    assert "GPT-5 发布" in resp.text
+
+
+def test_home_key_badge(authed):
+    resp = authed.get("/")
+    assert "重点" in resp.text

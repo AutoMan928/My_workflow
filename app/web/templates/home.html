@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}首页 · 资讯平台{% endblock %}
+{% block content %}
+{% for section in sections %}
+<section class="mb-10">
+  <div class="flex items-center gap-3 mb-4">
+    <h2 class="text-lg font-bold">{{ section['label'] }}</h2>
+    <a href="/category/{{ section['slug'] }}"
+       class="text-sm text-blue-500 hover:underline">全部 →</a>
+  </div>
+  {% if not section['items'] %}
+    <p class="text-gray-400 text-sm">暂无内容</p>
+  {% else %}
+  <div class="flex flex-col gap-2">
+    {% for item in section['items'] %}
+    <a href="/item/{{ item.id }}"
+       class="bg-white rounded-lg border px-4 py-3 hover:shadow-sm transition flex items-start gap-3
+              {{ 'opacity-60' if item.is_read else '' }}">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          {% if item.is_key %}
+          <span class="text-xs bg-red-500 text-white rounded px-1.5 py-0.5 shrink-0">重点</span>
+          {% endif %}
+          <span class="font-medium text-gray-900 truncate">{{ item.title }}</span>
+        </div>
+        {% if item.summary_zh %}
+        <p class="text-sm text-gray-500 mt-1 line-clamp-1">{{ item.summary_zh }}</p>
+        {% endif %}
+      </div>
+      {% if item.score %}
+      <span class="text-xs text-gray-400 shrink-0">{{ "%.1f"|format(item.score) }}</span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
+{% endblock %}
