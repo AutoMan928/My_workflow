@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 
 class BankingResult(BaseModel):
+    title_zh: str | None = None
     summary_zh: str
     score: float
     is_key: bool
@@ -11,6 +12,7 @@ class BankingResult(BaseModel):
 
 
 class TechResult(BaseModel):
+    title_zh: str | None = None
     summary_zh: str
     score: float
     is_key: bool
@@ -24,6 +26,7 @@ class StartupExtra(BaseModel):
 
 
 class StartupResult(BaseModel):
+    title_zh: str | None = None
     summary_zh: str
     score: float
     is_key: bool

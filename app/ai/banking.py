@@ -15,6 +15,7 @@ BANKING_PROMPT = """\
 
 返回格式（严格 JSON，不要额外文字）：
 {{
+  "title_zh": "若标题为英文则翻译为简洁中文，否则与原标题相同",
   "summary_zh": "3-4句中文摘要",
   "score": <0-10浮点数，监管影响力×业务可借鉴性>,
   "is_key": <true/false>,

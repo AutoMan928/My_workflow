@@ -1,7 +1,8 @@
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, date
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config import AppConfig, CategoryConfig
@@ -31,6 +32,22 @@ async def _fetch_category(category: CategoryConfig) -> list[RawItem]:
     return items
 
 
+_DAILY_LIMIT = 50
+
+
+def _today_count(category_slug: str, db: Session) -> int:
+    today = date.today()
+    return (
+        db.query(func.count(Item.id))
+        .filter(
+            Item.category_slug == category_slug,
+            func.date(Item.fetched_at) == today,
+        )
+        .scalar()
+        or 0
+    )
+
+
 def _save_items(
     raw_items: list[RawItem],
     ai_results: list,
@@ -38,13 +55,20 @@ def _save_items(
     db: Session,
 ) -> list[Item]:
     saved: list[Item] = []
+    today_count = _today_count(category.slug, db)
     for raw, ai in zip(raw_items, ai_results):
+        if today_count >= _DAILY_LIMIT:
+            logger.info("Daily limit %d reached for %s, skipping rest", _DAILY_LIMIT, category.slug)
+            break
         ai_extra = None
         if hasattr(ai, "ai_extra") and ai.ai_extra:
             ai_extra = ai.ai_extra.model_dump()
         if hasattr(ai, "work_impact") and ai.work_impact:
             ai_extra = ai_extra or {}
             ai_extra["work_impact"] = ai.work_impact
+        if hasattr(ai, "title_zh") and ai.title_zh:
+            ai_extra = ai_extra or {}
+            ai_extra["title_zh"] = ai.title_zh
 
         item = Item(
             source_id=0,
@@ -64,6 +88,7 @@ def _save_items(
         try:
             db.flush()
             saved.append(item)
+            today_count += 1
         except Exception as exc:
             db.rollback()
             logger.warning("Skip duplicate item %r: %s", raw.url, exc)

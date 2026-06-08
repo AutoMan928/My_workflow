@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import desc
@@ -11,17 +13,28 @@ router = APIRouter()
 
 _CATEGORY_LABELS = {
     "banking": "银行用户运营",
-    "tech": "技术与AI工具",
+    "tech": "技术与 AI 工具",
     "startup": "个人创业",
 }
 _CATEGORY_ORDER = ["banking", "tech", "startup"]
-_HOME_LIMIT = 10
+_HOME_LIMIT = 8
+_FEATURED_LIMIT = 5
+_FEATURED_DAYS = 2
 
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db)):
     if not check_auth(request):
         return RedirectResponse(url="/login", status_code=302)
+
+    cutoff = date.today() - timedelta(days=_FEATURED_DAYS)
+    featured = (
+        db.query(Item)
+        .filter(Item.fetched_at >= cutoff, Item.score.isnot(None))
+        .order_by(desc(Item.score))
+        .limit(_FEATURED_LIMIT)
+        .all()
+    )
 
     sections = []
     for slug in _CATEGORY_ORDER:
@@ -38,4 +51,6 @@ async def home(request: Request, db: Session = Depends(get_db)):
             "items": items,
         })
 
-    return templates.TemplateResponse(request, "home.html", {"sections": sections})
+    return templates.TemplateResponse(
+        request, "home.html", {"sections": sections, "featured": featured}
+    )
