@@ -10,7 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to Alibaba Cloud via SSH
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sync files to server
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --delete --exclude='.env' --exclude='data/' --exclude='.git/'
+          path: ./
+          remote_path: /opt/news-platform/
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Restart containers
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -18,13 +31,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-
             cd /opt/news-platform
-
-            git pull origin main
-
             docker compose up -d --build
-
             docker compose ps
-
             echo "Deploy complete at $(date '+%Y-%m-%d %H:%M:%S')"
