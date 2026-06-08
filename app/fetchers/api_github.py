@@ -13,7 +13,7 @@ class GithubFetcher(BaseFetcher):
         query = " ".join(f"topic:{t}" for t in topics) + " sort:stars"
 
         try:
-            async with httpx.AsyncClient(timeout=15) as client:
+            async with httpx.AsyncClient(timeout=15, trust_env=False) as client:
                 resp = await client.get(
                     self.source.feed_url,
                     params={"q": query, "sort": "stars", "order": "desc",

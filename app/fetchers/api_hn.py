@@ -20,7 +20,7 @@ class HNFetcher(BaseFetcher):
         endpoint = STORY_TYPE_MAP.get(story_type, "topstories")
 
         try:
-            async with httpx.AsyncClient(timeout=15) as client:
+            async with httpx.AsyncClient(timeout=15, trust_env=False) as client:
                 resp = await client.get(f"{base}/{endpoint}.json")
                 resp.raise_for_status()
                 story_ids = resp.json()[:limit]
