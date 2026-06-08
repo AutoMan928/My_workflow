@@ -1,4 +1,4 @@
-from datetime import date as date_type
+from datetime import date as date_type, datetime, time as _time
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -41,9 +41,22 @@ async def report(slot: str, date: str, request: Request, db: Session = Depends(g
     if slot not in _VALID_SLOTS:
         raise HTTPException(status_code=404, detail="无效的时段")
 
-    target = date_type.fromisoformat(date)
-    all_logs = db.query(PushLog).filter(PushLog.slot == slot).all()
-    logs = [l for l in all_logs if l.pushed_at and l.pushed_at.date() == target]
+    try:
+        target = date_type.fromisoformat(date)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="无效的日期格式，请使用 YYYY-MM-DD")
+
+    start_dt = datetime.combine(target, _time.min)
+    end_dt = datetime.combine(target, _time.max)
+    logs = (
+        db.query(PushLog)
+        .filter(
+            PushLog.slot == slot,
+            PushLog.pushed_at >= start_dt,
+            PushLog.pushed_at <= end_dt,
+        )
+        .all()
+    )
 
     item_ids: list[int] = []
     for log in logs:
