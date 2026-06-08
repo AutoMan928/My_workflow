@@ -78,7 +78,7 @@ async def daily_report(
         sections.append({
             "slug": slug,
             "meta": meta,
-            "items": items,
+            "rows": items,
             "key_count": sum(1 for i in items if i.is_key),
             "total": total_today,
         })

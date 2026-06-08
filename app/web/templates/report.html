@@ -40,7 +40,7 @@
   {% else %}
 
   {% for section in sections %}
-  {% if section.items %}
+  {% if section.rows %}
   <!-- Section -->
   <div id="{{ section.slug }}" class="mb-10">
 
@@ -59,7 +59,7 @@
 
     <!-- Items -->
     <div class="flex flex-col gap-4">
-      {% for item in section.items %}
+      {% for item in section.rows %}
       {% set title = (item.ai_extra or {}).get("title_zh") or item.title %}
       {% set insight_val = (item.ai_extra or {}).get(section.meta.insight_field) %}
       <a href="/item/{{ item.id }}"
@@ -131,7 +131,7 @@
       {% endfor %}
     </div>
 
-    {% if section.total > section.items|length %}
+    {% if section.total > section.rows|length %}
     <a href="/category/{{ section.slug }}"
        class="block text-center text-xs text-stone-400 hover:text-stone-600 mt-3 py-2 transition-colors">
       查看全部 {{ section.total }} 条 →
