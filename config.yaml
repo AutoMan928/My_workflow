@@ -1,0 +1,117 @@
+settings:
+  dedup_days: 7
+  db_path: data/news.db
+  timezone: Asia/Shanghai
+
+categories:
+  - name: 银行用户运营
+    slug: banking
+    depth_level: medium_deep
+    schedule: [morning, evening]
+    enabled: true
+    importance_rule:
+      is_key_threshold: 7.0
+      boost_tags: [业务方案, 方法论, 监管政策, 竞品动态]
+    sources:
+      - name: 艾瑞咨询
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/iresearch/report"
+        enabled: true
+        extra: {}
+      - name: 36氪·金融
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/36kr/newsflashes"
+        enabled: true
+        extra: {}
+      - name: 零壹财经
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/01caijing/articles"
+        enabled: true
+        extra: {}
+      - name: 亿欧·金融科技
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/iyiou/fintech"
+        enabled: true
+        extra: {}
+      - name: 央行官网
+        fetch_type: scraper
+        feed_url: "http://www.pbc.gov.cn/goutongjiaoliu/113456/index.html"
+        enabled: false
+        extra: {selector: ".newsList li"}
+
+  - name: 技术与AI工具
+    slug: tech
+    depth_level: medium
+    schedule: [morning]
+    enabled: true
+    importance_rule:
+      is_key_threshold: 7.5
+      boost_tags: []
+    sources:
+      - name: GitHub Trending (AI)
+        fetch_type: api_github
+        feed_url: "https://api.github.com/search/repositories"
+        enabled: true
+        extra:
+          topics: [ai, agent, llm]
+          period: daily
+          per_page: 20
+      - name: Hacker News
+        fetch_type: api_hn
+        feed_url: "https://hacker-news.firebaseio.com/v0"
+        enabled: true
+        extra:
+          story_type: top
+          limit: 30
+      - name: Product Hunt
+        fetch_type: api_ph
+        feed_url: "https://www.producthunt.com/feed"
+        enabled: true
+        extra: {}
+      - name: Hugging Face Trending
+        fetch_type: api_hf
+        feed_url: "https://huggingface.co/api"
+        enabled: true
+        extra: {}
+      - name: 机器之心
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/jiqizhixin"
+        enabled: true
+        extra: {}
+      - name: 量子位
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/qbitai"
+        enabled: true
+        extra: {}
+
+  - name: 个人创业
+    slug: startup
+    depth_level: deep
+    schedule: [morning]
+    enabled: true
+    importance_rule:
+      is_key_threshold: 6.5
+      boost_tags: []
+    sources:
+      - name: IndieHackers
+        fetch_type: rss
+        feed_url: "https://www.indiehackers.com/feed.rss"
+        enabled: true
+        extra: {}
+      - name: Product Hunt (Startup)
+        fetch_type: api_ph
+        feed_url: "https://www.producthunt.com/feed"
+        enabled: true
+        extra: {view: startup}
+      - name: 36氪·创投
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/36kr/venture"
+        enabled: true
+        extra: {}
+      - name: Hacker News Show HN
+        fetch_type: api_hn
+        feed_url: "https://hacker-news.firebaseio.com/v0"
+        enabled: true
+        extra:
+          story_type: show
+          limit: 20
