@@ -9,7 +9,7 @@ categories:
     depth_level: medium_deep
     schedule: [morning, evening]
     enabled: true
-    min_save_score: 5.0
+    min_save_score: 4.0
     importance_rule:
       is_key_threshold: 7.0
       boost_tags: [业务方案, 方法论, 监管政策, 竞品动态]
@@ -37,6 +37,11 @@ categories:
       - name: 华尔街见闻
         fetch_type: rss
         feed_url: "http://{RSSHUB_BASE_URL}/wallstreetcn/news/essential"
+        enabled: true
+        extra: {}
+      - name: 第一财经快讯
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/yicai/brief"
         enabled: true
         extra: {}
 
