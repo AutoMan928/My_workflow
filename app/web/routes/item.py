@@ -36,8 +36,12 @@ async def toggle_field(
     if not item:
         raise HTTPException(status_code=404)
     setattr(item, field, not getattr(item, field))
-    db.commit()
-    db.refresh(item)
+    try:
+        db.commit()
+        db.refresh(item)
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="数据库错误")
     is_on = getattr(item, field)
     btn_text = ("已读" if is_on else "标为已读") if field == "is_read" else ("已收藏" if is_on else "收藏")
     btn_class = "bg-gray-700 text-white" if is_on else "bg-white text-gray-700 border"
