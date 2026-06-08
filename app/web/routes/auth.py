@@ -2,10 +2,10 @@ import os
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
-from app.web.deps import COOKIE_NAME, check_auth, make_session_cookie, templates
+from app.web.deps import COOKIE_NAME, COOKIE_MAX_AGE, check_auth, make_session_cookie, templates
 
 router = APIRouter()
-_SITE_PASSWORD = os.environ.get("SITE_PASSWORD", "changeme")
+_SITE_PASSWORD = os.environ["SITE_PASSWORD"]
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -23,7 +23,7 @@ async def login_submit(request: Request, password: str = Form(...)):
         )
     resp = RedirectResponse(url="/", status_code=302)
     resp.set_cookie(COOKIE_NAME, make_session_cookie(),
-                    max_age=48 * 3600, httponly=True, samesite="lax")
+                    max_age=COOKIE_MAX_AGE, httponly=True, samesite="lax")
     return resp
 
 
