@@ -60,6 +60,11 @@ def _save_items(
         if today_count >= _DAILY_LIMIT:
             logger.info("Daily limit %d reached for %s, skipping rest", _DAILY_LIMIT, category.slug)
             break
+        item_score = getattr(ai, "score", 0.0) or 0.0
+        if item_score < category.min_save_score:
+            logger.debug("Score %.1f below min_save_score %.1f, skipping %r",
+                         item_score, category.min_save_score, raw.title)
+            continue
         ai_extra = None
         if hasattr(ai, "ai_extra") and ai.ai_extra:
             ai_extra = ai.ai_extra.model_dump()

@@ -9,35 +9,36 @@ categories:
     depth_level: medium_deep
     schedule: [morning, evening]
     enabled: true
+    min_save_score: 5.0
     importance_rule:
       is_key_threshold: 7.0
       boost_tags: [业务方案, 方法论, 监管政策, 竞品动态]
     sources:
-      - name: 艾瑞咨询
+      - name: 财联社电报
         fetch_type: rss
-        feed_url: "http://{RSSHUB_BASE_URL}/iresearch/report"
+        feed_url: "http://{RSSHUB_BASE_URL}/cls/telegraph"
         enabled: true
         extra: {}
-      - name: 36氪·金融
+      - name: 财联社深度
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/cls/depth"
+        enabled: true
+        extra: {}
+      - name: 财新网
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/caixin/article"
+        enabled: true
+        extra: {}
+      - name: 36氪快讯
         fetch_type: rss
         feed_url: "http://{RSSHUB_BASE_URL}/36kr/newsflashes"
         enabled: true
         extra: {}
-      - name: 零壹财经
+      - name: 华尔街见闻
         fetch_type: rss
-        feed_url: "http://{RSSHUB_BASE_URL}/01caijing/articles"
-        enabled: false
+        feed_url: "http://{RSSHUB_BASE_URL}/wallstreetcn/news/essential"
+        enabled: true
         extra: {}
-      - name: 亿欧·金融科技
-        fetch_type: rss
-        feed_url: "http://{RSSHUB_BASE_URL}/iyiou/fintech"
-        enabled: false
-        extra: {}
-      - name: 央行官网
-        fetch_type: scraper
-        feed_url: "http://www.pbc.gov.cn/goutongjiaoliu/113456/index.html"
-        enabled: false
-        extra: {selector: ".newsList li"}
 
   - name: 技术与AI工具
     slug: tech

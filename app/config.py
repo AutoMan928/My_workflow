@@ -28,6 +28,7 @@ class CategoryConfig(BaseModel):
     importance_rule: ImportanceRule
     sources: list[SourceConfig]
     enabled: bool = True
+    min_save_score: float = 0.0
 
 
 class Settings(BaseModel):
