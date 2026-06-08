@@ -1,5 +1,6 @@
 import logging
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
+from typing import Optional
 from app.fetchers.base import BaseFetcher, RawItem
 
 logger = logging.getLogger(__name__)
@@ -9,7 +10,7 @@ SCRAPE_TIMEOUT_MS = 30000
 
 
 class ScraperFetcher(BaseFetcher):
-    async def fetch(self) -> list[RawItem]:
+    async def fetch(self) -> list:
         try:
             from playwright.async_api import async_playwright
         except ImportError:
@@ -19,12 +20,12 @@ class ScraperFetcher(BaseFetcher):
             return []
 
         selector = self.source.extra.get("selector", "a")
-        items: list[RawItem] = []
-        parsed_base = urlparse(self.source.feed_url)
+        items: list = []
 
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
+            browser = None
             try:
+                browser = await p.chromium.launch(headless=True)
                 page = await browser.new_page()
                 await page.goto(self.source.feed_url, timeout=SCRAPE_TIMEOUT_MS)
                 links = await page.query_selector_all(selector)
@@ -33,11 +34,11 @@ class ScraperFetcher(BaseFetcher):
                     href = await link.get_attribute("href") or ""
                     if not title or not href:
                         continue
-                    if href.startswith("/"):
-                        href = f"{parsed_base.scheme}://{parsed_base.netloc}{href}"
+                    href = urljoin(self.source.feed_url, href)
                     items.append(RawItem(title=title, url=href))
             except Exception as exc:
                 logger.error("Scraper failed for %s: %s", self.source.name, exc)
             finally:
-                await browser.close()
+                if browser:
+                    await browser.close()
         return items

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import httpx
+from typing import Optional
 from app.fetchers.base import BaseFetcher, RawItem
 
 logger = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ STORY_TYPE_MAP = {
 
 
 class HNFetcher(BaseFetcher):
-    async def fetch(self) -> list[RawItem]:
+    async def fetch(self) -> list:
         base = self.source.feed_url.rstrip("/")
         story_type = self.source.extra.get("story_type", "top")
         limit = self.source.extra.get("limit", 30)
@@ -32,7 +33,7 @@ class HNFetcher(BaseFetcher):
             logger.error("HN fetch failed: %s", exc)
             return []
 
-        items: list[RawItem] = []
+        items: list = []
         for result in stories:
             if isinstance(result, Exception):
                 logger.warning("HN item fetch failed: %s", result)

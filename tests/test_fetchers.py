@@ -141,3 +141,28 @@ def test_registry_unknown_raises():
                        feed_url="https://x.com", enabled=True, extra={})
     with pytest.raises(ValueError, match="Unknown fetch_type"):
         get_fetcher(bad)
+
+
+# ── HuggingFace ────────────────────────────────────────────────────────────────
+from app.fetchers.api_hf import HuggingFaceFetcher
+
+HF_RESPONSE = [
+    {"id": "org/model-name", "modelId": "org/model-name",
+     "downloads": 10000, "likes": 500,
+     "cardData": {"description": "A great model"}},
+]
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_hf_fetcher_returns_items():
+    respx.get("https://huggingface.co/api/models").mock(
+        return_value=_httpx.Response(200, json=HF_RESPONSE)
+    )
+    src = SourceConfig(name="HF", fetch_type="api_hf",
+                       feed_url="https://huggingface.co/api",
+                       enabled=True, extra={})
+    items = await HuggingFaceFetcher(src).fetch()
+    assert len(items) == 1
+    assert items[0].url == "https://huggingface.co/org/model-name"
+    assert items[0].extra["likes"] == 500

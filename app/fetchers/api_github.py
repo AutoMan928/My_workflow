@@ -1,19 +1,20 @@
 import logging
 import os
 import httpx
+from typing import Optional
 from app.fetchers.base import BaseFetcher, RawItem
 
 logger = logging.getLogger(__name__)
 
 
 class GithubFetcher(BaseFetcher):
-    async def fetch(self) -> list[RawItem]:
-        topics: list[str] = self.source.extra.get("topics", ["ai", "agent", "llm"])
+    async def fetch(self) -> list:
+        topics: list = self.source.extra.get("topics", ["ai", "agent", "llm"])
         per_page: int = self.source.extra.get("per_page", 20)
         query = " ".join(f"topic:{t}" for t in topics) + " sort:stars"
 
         token = self.source.extra.get("token") or os.environ.get("GITHUB_TOKEN")
-        headers: dict = {"Accept": "application/vnd.github.v3+json"}
+        headers: dict = {"Accept": "application/vnd.github.v3+json"}  # type: ignore
         if token:
             headers["Authorization"] = f"Bearer {token}"
 
@@ -31,7 +32,7 @@ class GithubFetcher(BaseFetcher):
             logger.error("GitHub fetch failed: %s", exc)
             return []
 
-        items: list[RawItem] = []
+        items: list = []
         for repo in data.get("items", []):
             name = repo.get("full_name", "")
             url = repo.get("html_url", "")
