@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    image: news-platform:latest
+    container_name: news-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file: .env
+    environment:
+      # 覆盖 .env 中的值，使用 Docker 内部服务名访问 RSSHub
+      - RSSHUB_BASE_URL=http://rsshub:1200
+    volumes:
+      - ./data:/app/data
+      - ./config.yaml:/app/config.yaml
+    depends_on:
+      - rsshub
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  rsshub:
+    image: diygod/rsshub:latest
+    container_name: news-rsshub
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1200:1200"
+    environment:
+      - NODE_ENV=production
+      - CACHE_TYPE=memory
+      - CACHE_EXPIRE=300
