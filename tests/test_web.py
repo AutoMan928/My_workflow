@@ -67,6 +67,13 @@ def _seed():
 
 _seed()
 
+# 对测试引擎初始化 FTS5
+from sqlalchemy import text as _t
+with _engine.connect() as _c:
+    _c.execute(_t("CREATE VIRTUAL TABLE IF NOT EXISTS items_fts USING fts5(title, summary_zh, content='items', content_rowid='id')"))
+    _c.execute(_t("INSERT OR IGNORE INTO items_fts(rowid, title, summary_zh) SELECT id, title, COALESCE(summary_zh,'') FROM items"))
+    _c.commit()
+
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 @pytest.fixture(scope="module")
@@ -205,3 +212,21 @@ def test_item_toggle_read(authed):
 def test_item_not_found(authed):
     resp = authed.get("/item/99999")
     assert resp.status_code == 404
+
+
+# ── Task 5: Search 测试 ────────────────────────────────────────────────────────
+def test_search_page_200(authed):
+    resp = authed.get("/search")
+    assert resp.status_code == 200
+
+
+def test_search_returns_results(authed):
+    resp = authed.get("/search?q=银行")
+    assert resp.status_code == 200
+    assert "银行降息公告" in resp.text
+
+
+def test_search_no_results(authed):
+    resp = authed.get("/search?q=xyzabc123notfound")
+    assert resp.status_code == 200
+    assert "没有找到" in resp.text
