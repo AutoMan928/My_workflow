@@ -120,3 +120,24 @@ async def test_hn_show_filter():
                        enabled=True, extra={"story_type": "show", "limit": 1})
     items = await HNFetcher(src).fetch()
     assert len(items) == 1
+
+
+# ── Registry ──────────────────────────────────────────────────────────────────
+from app.fetchers.registry import get_fetcher
+from app.fetchers.rss import RssFetcher
+from app.fetchers.api_github import GithubFetcher
+
+
+def test_registry_correct_class():
+    rss = make_rss_source()
+    gh = SourceConfig(name="GH", fetch_type="api_github",
+                      feed_url="https://api.github.com", enabled=True, extra={})
+    assert isinstance(get_fetcher(rss), RssFetcher)
+    assert isinstance(get_fetcher(gh), GithubFetcher)
+
+
+def test_registry_unknown_raises():
+    bad = SourceConfig(name="X", fetch_type="unknown",
+                       feed_url="https://x.com", enabled=True, extra={})
+    with pytest.raises(ValueError, match="Unknown fetch_type"):
+        get_fetcher(bad)
