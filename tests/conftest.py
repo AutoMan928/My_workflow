@@ -3,7 +3,7 @@ import os
 import pytest
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
-os.environ.setdefault("ANTHROPIC_API_KEY", "test-key")
+os.environ.setdefault("DEEPSEEK_API_KEY", "test-key")
 os.environ.setdefault("RSSHUB_BASE_URL", "http://localhost:1200")
 
 

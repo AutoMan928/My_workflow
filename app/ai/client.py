@@ -1,8 +1,9 @@
-
 import json
 import logging
 import os
 from typing import Literal
+
+import httpx
 
 logger = logging.getLogger(__name__)
 
@@ -27,22 +28,15 @@ DRY_RUN_RESPONSES: dict[str, dict] = {
         "is_key": True,
         "ai_extra": {
             "fit_score": 7.2,
-            "ai_approach": "【dry-run】可用Claude API单人开发，周期约2个月。",
+            "ai_approach": "【dry-run】可用AI API单人开发，周期约2个月。",
             "monetization": "【dry-run】订阅制，月费99元，预计6个月回本。",
             "entry_advice": "【dry-run】建议从微信小程序切入，先验证付费意愿。",
         },
     },
 }
 
-_client = None
-
-
-def _get_client():
-    global _client
-    if _client is None:
-        from anthropic import Anthropic
-        _client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    return _client
+_DEEPSEEK_BASE_URL = "https://api.deepseek.com"
+_DEFAULT_MODEL = "deepseek-chat"
 
 
 def call_claude(
@@ -55,17 +49,22 @@ def call_claude(
     if dry_run:
         return json.dumps(DRY_RUN_RESPONSES[result_type], ensure_ascii=False)
 
-    default_model = (
-        "claude-sonnet-4-6" if result_type == "startup"
-        else "claude-haiku-4-5-20251001"
-    )
+    api_key = os.environ["DEEPSEEK_API_KEY"]
+    target_model = model or _DEFAULT_MODEL
+
     try:
-        response = _get_client().messages.create(
-            model=model or default_model,
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        return response.content[0].text
+        with httpx.Client(timeout=30, trust_env=False) as client:
+            resp = client.post(
+                f"{_DEEPSEEK_BASE_URL}/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json={
+                    "model": target_model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "max_tokens": max_tokens,
+                },
+            )
+            resp.raise_for_status()
+            return resp.json()["choices"][0]["message"]["content"]
     except Exception as exc:
-        logger.error("Claude API call failed: %s", exc)
+        logger.error("DeepSeek API call failed: %s", exc)
         raise
