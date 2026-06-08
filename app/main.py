@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from app.web.routes import auth, home
+from app.web.routes import auth, home, category
 
 app = FastAPI(title="News Platform", version="0.1.0")
 app.include_router(auth.router)
 app.include_router(home.router)
+app.include_router(category.router)
 
 
 @app.get("/health")

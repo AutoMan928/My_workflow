@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ label }} · 资讯平台{% endblock %}
+{% block content %}
+<div class="flex items-center gap-4 mb-6">
+  <h1 class="text-xl font-bold">{{ label }}</h1>
+  <label class="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
+    <input type="checkbox" {% if only_key %}checked{% endif %}
+           onchange="location.href='/category/{{ slug }}?only_key='+this.checked"
+           class="rounded" />
+    仅重点
+  </label>
+</div>
+<div id="item-list" class="flex flex-col gap-2">
+  {% include "_items_partial.html" %}
+</div>
+{% endblock %}

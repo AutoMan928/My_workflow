@@ -135,3 +135,28 @@ def test_home_shows_seeded_items(authed):
 def test_home_key_badge(authed):
     resp = authed.get("/")
     assert "重点" in resp.text
+
+
+# ── Task 3: Category 测试 ──────────────────────────────────────────────────────
+def test_category_200(authed):
+    resp = authed.get("/category/banking")
+    assert resp.status_code == 200
+    assert "银行用户运营" in resp.text
+
+
+def test_category_shows_items(authed):
+    resp = authed.get("/category/banking")
+    assert "银行降息公告" in resp.text
+
+
+def test_category_unknown_slug_404(authed):
+    resp = authed.get("/category/unknown")
+    assert resp.status_code == 404
+
+
+def test_category_htmx_returns_partial(authed):
+    resp = authed.get("/category/banking?page=0",
+                      headers={"HX-Request": "true"})
+    assert resp.status_code == 200
+    assert "<html" not in resp.text
+    assert "银行降息公告" in resp.text
