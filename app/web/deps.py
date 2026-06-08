@@ -5,8 +5,8 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 COOKIE_NAME = "news_session"
 COOKIE_MAX_AGE = 48 * 3600
-_SECRET_KEY = os.environ["SECRET_KEY"]
-_signer = URLSafeTimedSerializer(_SECRET_KEY)
+SECRET_KEY = os.environ["SECRET_KEY"]
+_signer = URLSafeTimedSerializer(SECRET_KEY)
 
 templates = Jinja2Templates(directory="app/web/templates")
 
