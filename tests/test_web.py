@@ -230,3 +230,11 @@ def test_search_no_results(authed):
     resp = authed.get("/search?q=xyzabc123notfound")
     assert resp.status_code == 200
     assert "没有找到" in resp.text
+
+
+def test_search_unauthenticated_redirects():
+    from starlette.testclient import TestClient
+    with TestClient(app) as client:
+        resp = client.get("/search", follow_redirects=False)
+    assert resp.status_code == 302
+    assert "/login" in resp.headers["location"]

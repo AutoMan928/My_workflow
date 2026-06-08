@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import text
@@ -9,6 +10,7 @@ from app.web.deps import check_auth, templates
 
 router = APIRouter()
 _SEARCH_LIMIT = 50
+logger = logging.getLogger(__name__)
 
 
 @router.get("/search", response_class=HTMLResponse)
@@ -22,14 +24,13 @@ async def search(request: Request, q: str = "", db: Session = Depends(get_db)):
         try:
             rows = db.execute(
                 text("SELECT rowid FROM items_fts WHERE items_fts MATCH :q ORDER BY rank LIMIT :lim"),
-                {"q": q_clean, "lim": _SEARCH_LIMIT},
+                {"q": q_clean + "*", "lim": _SEARCH_LIMIT},
             ).fetchall()
             ids = [r[0] for r in rows]
             if ids:
                 items = db.query(Item).filter(Item.id.in_(ids)).all()
-        except Exception:
-            ids = []
-        if not items:
+        except Exception as exc:
+            logger.warning("FTS5 search failed for %r, falling back to LIKE: %s", q_clean, exc)
             pattern = f"%{q_clean}%"
             items = (
                 db.query(Item)

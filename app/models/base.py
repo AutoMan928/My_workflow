@@ -18,7 +18,7 @@ class Base(DeclarativeBase):
 
 
 def _init_fts() -> None:
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(_sql_text("""
             CREATE VIRTUAL TABLE IF NOT EXISTS items_fts USING fts5(
                 title, summary_zh, content='items', content_rowid='id'
@@ -34,7 +34,6 @@ def _init_fts() -> None:
             INSERT OR IGNORE INTO items_fts(rowid, title, summary_zh)
             SELECT id, title, COALESCE(summary_zh, '') FROM items
         """))
-        conn.commit()
 
 
 def init_db() -> None:
