@@ -26,12 +26,12 @@ categories:
       - name: 零壹财经
         fetch_type: rss
         feed_url: "http://{RSSHUB_BASE_URL}/01caijing/articles"
-        enabled: true
+        enabled: false
         extra: {}
       - name: 亿欧·金融科技
         fetch_type: rss
         feed_url: "http://{RSSHUB_BASE_URL}/iyiou/fintech"
-        enabled: true
+        enabled: false
         extra: {}
       - name: 央行官网
         fetch_type: scraper
