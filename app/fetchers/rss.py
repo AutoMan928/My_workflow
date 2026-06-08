@@ -2,7 +2,6 @@ import asyncio
 import logging
 from datetime import datetime
 from time import mktime, struct_time
-from typing import List, Optional
 
 import feedparser
 
@@ -11,7 +10,7 @@ from app.fetchers.base import BaseFetcher, RawItem
 logger = logging.getLogger(__name__)
 
 
-def _parse_time(t: Optional[struct_time]) -> Optional[datetime]:
+def _parse_time(t: struct_time | None) -> datetime | None:
     if t is None:
         return None
     try:
@@ -21,7 +20,7 @@ def _parse_time(t: Optional[struct_time]) -> Optional[datetime]:
 
 
 class RssFetcher(BaseFetcher):
-    async def fetch(self) -> List[RawItem]:
+    async def fetch(self) -> list[RawItem]:
         try:
             feed = await asyncio.to_thread(feedparser.parse, self.source.feed_url)
         except Exception as exc:
@@ -32,7 +31,7 @@ class RssFetcher(BaseFetcher):
             logger.warning("Bozo feed %s: %s", self.source.name, feed.bozo_exception)
             return []
 
-        items: List[RawItem] = []
+        items: list[RawItem] = []
         for entry in feed.entries:
             title = getattr(entry, "title", "").strip()
             url = getattr(entry, "link", "").strip()
