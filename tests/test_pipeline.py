@@ -58,3 +58,49 @@ def test_no_duplicate_push(db):
 
 def test_empty_items_returns_true(db):
     assert push_key_items("morning", [], db, dry_run=True) is True
+
+
+from unittest.mock import patch, AsyncMock
+from app.scheduler.pipeline import run_pipeline
+from app.config import AppConfig, CategoryConfig, ImportanceRule, SourceConfig, Settings
+
+
+def _make_config() -> AppConfig:
+    cat = CategoryConfig(
+        name="银行", slug="banking", depth_level="medium_deep",
+        schedule=["morning"], enabled=True,
+        importance_rule=ImportanceRule(is_key_threshold=7.0, boost_tags=[]),
+        sources=[SourceConfig(name="RSS", fetch_type="rss",
+                              feed_url="https://example.com/feed",
+                              enabled=True, extra={})],
+    )
+    return AppConfig(settings=Settings(), categories=[cat])
+
+
+@pytest.fixture
+def full_db():
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    s = Session()
+    yield s
+    s.close()
+
+
+def test_pipeline_dry_run_runs(full_db):
+    from app.fetchers.base import RawItem
+    mock_items = [RawItem(title="央行降息", url="https://example.com/news1",
+                          raw_text="内容")]
+    cfg = _make_config()
+    with patch("app.scheduler.pipeline._fetch_category",
+               new_callable=AsyncMock, return_value=mock_items):
+        summary = run_pipeline("morning", cfg.categories, full_db, cfg, dry_run=True)
+    assert "banking" in summary["categories"]
+
+
+def test_pipeline_skips_wrong_slot(full_db):
+    cfg = _make_config()
+    with patch("app.scheduler.pipeline._fetch_category",
+               new_callable=AsyncMock, return_value=[]):
+        summary = run_pipeline("evening", cfg.categories, full_db, cfg, dry_run=True)
+    assert summary["total_fetched"] == 0
