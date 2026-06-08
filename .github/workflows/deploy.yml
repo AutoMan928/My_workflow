@@ -13,15 +13,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
       - name: Sync files to server
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avzr --delete --exclude='.env' --exclude='data/' --exclude='.git/'
-          path: ./
-          remote_path: /opt/news-platform/
-          remote_host: ${{ secrets.SERVER_HOST }}
-          remote_user: ${{ secrets.SERVER_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          rsync -avzr --delete \
+            --exclude='.env' \
+            --exclude='data/' \
+            --exclude='.git/' \
+            --exclude='__pycache__/' \
+            --exclude='*.pyc' \
+            --exclude='.pytest_cache/' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/news-platform/
 
       - name: Restart containers
         uses: appleboy/ssh-action@v1.2.0
