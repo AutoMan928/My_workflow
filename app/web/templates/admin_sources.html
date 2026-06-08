@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}来源管理 · 资讯平台{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold mb-6">来源管理</h1>
+<div class="flex flex-col gap-3">
+  {% set ns = namespace(prev_cat="") %}
+  {% for s in sources %}
+  {% if s['cat_slug'] != ns.prev_cat %}
+  <h2 class="text-base font-semibold text-gray-700 mt-4 first:mt-0">{{ s['cat_name'] }}</h2>
+  {% set ns.prev_cat = s['cat_slug'] %}
+  {% endif %}
+  <div class="bg-white rounded-lg border px-4 py-3 flex items-center gap-4">
+    <form method="post" action="/admin/sources/toggle" class="shrink-0">
+      <input type="hidden" name="cat_index" value="{{ s['cat_index'] }}" />
+      <input type="hidden" name="src_index" value="{{ s['src_index'] }}" />
+      <button type="submit"
+              class="w-10 h-6 rounded-full relative transition-colors {{ 'bg-blue-500' if s['enabled'] else 'bg-gray-300' }}">
+        <span class="absolute top-0.5 {{ 'right-0.5' if s['enabled'] else 'left-0.5' }} w-5 h-5 bg-white rounded-full shadow"></span>
+      </button>
+    </form>
+    <div class="flex-1 min-w-0">
+      <p class="font-medium text-gray-800 text-sm">
+        {{ s['name'] }}
+        <span class="ml-2 text-xs bg-gray-100 text-gray-500 rounded px-1.5 py-0.5">{{ s['fetch_type'] }}</span>
+      </p>
+      <form method="post" action="/admin/sources/url" class="flex gap-2 mt-1">
+        <input type="hidden" name="cat_index" value="{{ s['cat_index'] }}" />
+        <input type="hidden" name="src_index" value="{{ s['src_index'] }}" />
+        <input type="text" name="feed_url" value="{{ s['feed_url'] }}"
+               class="flex-1 text-xs text-gray-500 border-b border-transparent hover:border-gray-300 focus:border-blue-400 focus:outline-none bg-transparent py-0.5 min-w-0" />
+        <button type="submit" class="text-xs text-blue-500 hover:text-blue-700 shrink-0">保存</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

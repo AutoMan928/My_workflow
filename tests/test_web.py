@@ -270,3 +270,15 @@ def test_report_shows_pushed_items(authed):
 def test_report_invalid_slot_404(authed):
     resp = authed.get("/report/weekly/2026-01-01")
     assert resp.status_code == 404
+
+
+# ── Task 7: Admin sources 测试 ────────────────────────────────────────────────
+def test_admin_sources_200(authed):
+    resp = authed.get("/admin/sources")
+    assert resp.status_code == 200
+    assert "来源管理" in resp.text
+
+
+def test_admin_sources_lists_sources(authed):
+    resp = authed.get("/admin/sources")
+    assert any(t in resp.text for t in ("rss", "api_github", "api_hn", "api_ph", "api_hf", "scraper"))
