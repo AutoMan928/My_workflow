@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from app.ai.client import call_claude
 from app.ai.schemas import StartupResult, StartupExtra
