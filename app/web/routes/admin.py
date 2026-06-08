@@ -11,7 +11,14 @@ _CONFIG_PATH = "config.yaml"
 
 
 def _load_raw() -> dict:
-    return yaml.safe_load(Path(_CONFIG_PATH).read_text(encoding="utf-8"))
+    try:
+        content = Path(_CONFIG_PATH).read_text(encoding="utf-8")
+        data = yaml.safe_load(content)
+        return data if isinstance(data, dict) else {}
+    except FileNotFoundError:
+        return {"categories": []}
+    except yaml.YAMLError:
+        return {"categories": []}
 
 
 def _save_raw(data: dict) -> None:
@@ -58,8 +65,14 @@ async def toggle_source(
     if not check_auth(request):
         return RedirectResponse(url="/login", status_code=302)
     data = _load_raw()
-    src = data["categories"][cat_index]["sources"][src_index]
+    cats = data.get("categories", [])
+    if not (0 <= cat_index < len(cats)):
+        return RedirectResponse(url="/admin/sources", status_code=302)
+    if not (0 <= src_index < len(cats[cat_index].get("sources", []))):
+        return RedirectResponse(url="/admin/sources", status_code=302)
+    src = cats[cat_index]["sources"][src_index]
     src["enabled"] = not src.get("enabled", True)
+    data["categories"] = cats
     _save_raw(data)
     return RedirectResponse(url="/admin/sources", status_code=302)
 
@@ -77,6 +90,12 @@ async def update_source_url(
     if not feed_url:
         return RedirectResponse(url="/admin/sources", status_code=302)
     data = _load_raw()
-    data["categories"][cat_index]["sources"][src_index]["feed_url"] = feed_url
+    cats = data.get("categories", [])
+    if not (0 <= cat_index < len(cats)):
+        return RedirectResponse(url="/admin/sources", status_code=302)
+    if not (0 <= src_index < len(cats[cat_index].get("sources", []))):
+        return RedirectResponse(url="/admin/sources", status_code=302)
+    cats[cat_index]["sources"][src_index]["feed_url"] = feed_url
+    data["categories"] = cats
     _save_raw(data)
     return RedirectResponse(url="/admin/sources", status_code=302)
