@@ -74,6 +74,11 @@ def _save_items(
         if hasattr(ai, "title_zh") and ai.title_zh:
             ai_extra = ai_extra or {}
             ai_extra["title_zh"] = ai.title_zh
+        for field in ("tool_use_case", "learn_priority"):
+            val = getattr(ai, field, None)
+            if val:
+                ai_extra = ai_extra or {}
+                ai_extra[field] = val
 
         item = Item(
             source_id=0,

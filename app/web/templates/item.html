@@ -96,6 +96,24 @@
       适合度：<span class="text-amber-700 font-medium">{{ item.ai_extra["fit_score"] }}</span>
     </p>
     {% endif %}
+
+    {% if item.ai_extra.get("tool_use_case") %}
+    <div class="border-l-2 border-stone-200 pl-4">
+      <p class="text-xs text-stone-400 mb-1.5 tracking-wide">使用场景</p>
+      <p class="text-stone-700 text-sm leading-relaxed">{{ item.ai_extra["tool_use_case"] }}</p>
+    </div>
+    {% endif %}
+
+    {% if item.ai_extra.get("learn_priority") %}
+    <div class="flex items-center gap-2">
+      <p class="text-xs text-stone-400 tracking-wide">学习优先级：</p>
+      {% set lp = item.ai_extra["learn_priority"] %}
+      <span class="text-xs px-2 py-0.5 rounded font-medium
+        {{ 'bg-red-50 text-red-600' if lp == '高' else
+           'bg-amber-50 text-amber-600' if lp == '中' else
+           'bg-stone-100 text-stone-400' }}">{{ lp }}</span>
+    </div>
+    {% endif %}
   </div>
   {% endif %}
 

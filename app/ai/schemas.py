@@ -16,6 +16,8 @@ class TechResult(BaseModel):
     summary_zh: str
     score: float
     is_key: bool
+    tool_use_case: str | None = None
+    learn_priority: str | None = None
 
 
 class StartupExtra(BaseModel):

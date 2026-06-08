@@ -52,19 +52,27 @@ def call_claude(
     api_key = os.environ["DEEPSEEK_API_KEY"]
     target_model = model or _DEFAULT_MODEL
 
-    try:
-        with httpx.Client(timeout=30, trust_env=False) as client:
-            resp = client.post(
-                f"{_DEEPSEEK_BASE_URL}/chat/completions",
-                headers={"Authorization": f"Bearer {api_key}"},
-                json={
-                    "model": target_model,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": max_tokens,
-                },
-            )
-            resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
-    except Exception as exc:
-        logger.error("DeepSeek API call failed: %s", exc)
-        raise
+    import time
+    last_exc: Exception | None = None
+    for attempt in range(3):
+        try:
+            with httpx.Client(timeout=45, trust_env=False) as client:
+                resp = client.post(
+                    f"{_DEEPSEEK_BASE_URL}/chat/completions",
+                    headers={"Authorization": f"Bearer {api_key}"},
+                    json={
+                        "model": target_model,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "max_tokens": max_tokens,
+                    },
+                )
+                resp.raise_for_status()
+                return resp.json()["choices"][0]["message"]["content"]
+        except Exception as exc:
+            last_exc = exc
+            if attempt < 2:
+                wait = 2 ** attempt
+                logger.warning("DeepSeek API attempt %d failed, retry in %ds: %s", attempt + 1, wait, exc)
+                time.sleep(wait)
+    logger.error("DeepSeek API call failed after 3 attempts: %s", last_exc)
+    raise last_exc

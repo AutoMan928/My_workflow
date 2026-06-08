@@ -1,36 +1,148 @@
 {% extends "base.html" %}
-{% block title %}{{ date }} {{ slot_label }}报 · 每日精选{% endblock %}
+{% block title %}每日简报 · {{ report_date.strftime("%m月%d日") }}{% endblock %}
 {% block content %}
 
 <div class="max-w-2xl">
-  <div class="pb-3 border-b border-stone-200 mb-1">
-    <h1 class="serif text-base font-semibold text-stone-800 tracking-wide">{{ date }} · {{ slot_label }}资讯速报</h1>
-    <p class="text-xs text-stone-400 mt-1 font-light">共 {{ items|length }} 条内容</p>
-  </div>
 
-  {% if not items %}
-  <p class="text-stone-300 text-sm text-center py-16">本次暂无推送记录</p>
-  {% else %}
-  <div class="divide-y divide-stone-100">
-    {% for item in items %}
-    <a href="/item/{{ item.id }}" class="item-row flex items-start gap-3 py-3.5 -mx-2 px-2 rounded">
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2">
-          {% if item.is_key %}
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
-          {% endif %}
-          <span class="text-xs text-stone-400 shrink-0 font-light">{{ item.category_slug }}</span>
-          <span class="text-sm font-medium text-stone-800 leading-snug">{{ item.title }}</span>
-        </div>
-        {% if item.summary_zh %}
-        <p class="text-xs text-stone-400 mt-1 line-clamp-1 leading-relaxed
-                  {{ 'pl-3.5' if item.is_key else '' }}">{{ item.summary_zh }}</p>
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-1">
+      <h1 class="serif text-lg font-semibold text-stone-900 tracking-wide">
+        {{ report_date.strftime("%Y年%m月%d日") }} · 每日简报
+      </h1>
+      <div class="flex items-center gap-3 text-xs text-stone-400">
+        <a href="/daily?day={{ prev_date }}" class="hover:text-stone-600 transition-colors">← 昨日</a>
+        {% if next_date %}
+        <a href="/daily?day={{ next_date }}" class="hover:text-stone-600 transition-colors">明日 →</a>
         {% endif %}
       </div>
+    </div>
+    {% if has_content %}
+    <div class="flex gap-4 mt-3">
+      {% for section in sections %}
+      {% if section.total > 0 %}
+      <a href="#{{ section.slug }}"
+         class="text-xs text-stone-400 hover:text-stone-700 transition-colors">
+        {{ section.meta.label }}
+        <span class="ml-1 text-stone-300 font-light">{{ section.total }}</span>
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  {% if not has_content %}
+  <div class="text-center py-20">
+    <p class="text-stone-300 text-sm">今日暂无资讯，请先运行 pipeline</p>
+    <p class="text-stone-200 text-xs mt-2">前往 <a href="/admin" class="underline hover:text-stone-400">管理页</a> 手动触发</p>
+  </div>
+  {% else %}
+
+  {% for section in sections %}
+  {% if section.items %}
+  <!-- Section -->
+  <div id="{{ section.slug }}" class="mb-10">
+
+    <!-- Section header -->
+    <div class="flex items-baseline gap-3 mb-4 pb-2 border-b border-stone-100">
+      <h2 class="serif text-sm font-semibold text-stone-700 tracking-wide">
+        {{ section.meta.label }}
+      </h2>
+      <span class="text-xs text-stone-300 font-light">
+        今日 {{ section.total }} 条
+        {% if section.key_count > 0 %}
+        · <span class="text-amber-500">{{ section.key_count }} 条重点</span>
+        {% endif %}
+      </span>
+    </div>
+
+    <!-- Items -->
+    <div class="flex flex-col gap-4">
+      {% for item in section.items %}
+      {% set title = (item.ai_extra or {}).get("title_zh") or item.title %}
+      {% set insight_val = (item.ai_extra or {}).get(section.meta.insight_field) %}
+      <a href="/item/{{ item.id }}"
+         class="group block rounded-xl border border-stone-100 p-4 hover:border-stone-200 hover:bg-stone-50 transition-all">
+
+        <!-- Title row -->
+        <div class="flex items-start gap-2.5 mb-2">
+          {% if item.is_key %}
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5"></span>
+          {% else %}
+          <span class="w-1.5 h-1.5 shrink-0 mt-1.5"></span>
+          {% endif %}
+          <span class="text-sm font-medium text-stone-800 leading-snug group-hover:text-stone-900">
+            {{ title }}
+          </span>
+          {% if item.score %}
+          <span class="ml-auto text-xs text-stone-300 font-light shrink-0 pt-0.5">
+            {{ "%.1f"|format(item.score) }}
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Summary -->
+        {% if item.summary_zh %}
+        <p class="text-xs text-stone-500 leading-relaxed pl-4 line-clamp-2 mb-2">
+          {{ item.summary_zh }}
+        </p>
+        {% endif %}
+
+        <!-- Insight -->
+        {% if insight_val %}
+        <div class="pl-4 mt-2 pt-2 border-t border-stone-100">
+          <span class="text-xs text-stone-400 mr-1.5 tracking-wide">{{ section.meta.insight_label }}：</span>
+          <span class="text-xs text-amber-700 leading-relaxed">{{ insight_val }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Tech extra: learn priority -->
+        {% if section.slug == "tech" and (item.ai_extra or {}).get("learn_priority") %}
+        <div class="pl-4 mt-1.5 flex items-center gap-1.5">
+          <span class="text-xs text-stone-400">学习优先：</span>
+          {% set lp = item.ai_extra.get("learn_priority") %}
+          <span class="text-xs px-1.5 py-0.5 rounded font-medium
+            {{ 'bg-red-50 text-red-600' if lp == '高' else
+               'bg-amber-50 text-amber-600' if lp == '中' else
+               'bg-stone-100 text-stone-400' }}">{{ lp }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Startup extra: monetization -->
+        {% if section.slug == "startup" and (item.ai_extra or {}).get("monetization") %}
+        <div class="pl-4 mt-1.5">
+          <span class="text-xs text-stone-400">变现路径：</span>
+          <span class="text-xs text-stone-500">{{ item.ai_extra.get("monetization") }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Tag + time -->
+        <div class="flex items-center gap-2 pl-4 mt-2">
+          {% if item.content_tag %}
+          <span class="bg-stone-100 text-stone-400 px-1.5 py-0.5 rounded text-xs">{{ item.content_tag }}</span>
+          {% endif %}
+          <span class="text-xs text-stone-300 font-light ml-auto">
+            {{ item.fetched_at.strftime("%H:%M") if item.fetched_at else "" }}
+          </span>
+        </div>
+
+      </a>
+      {% endfor %}
+    </div>
+
+    {% if section.total > section.items|length %}
+    <a href="/category/{{ section.slug }}"
+       class="block text-center text-xs text-stone-400 hover:text-stone-600 mt-3 py-2 transition-colors">
+      查看全部 {{ section.total }} 条 →
     </a>
-    {% endfor %}
+    {% endif %}
+
   </div>
   {% endif %}
-</div>
+  {% endfor %}
 
+  {% endif %}
+
+</div>
 {% endblock %}
