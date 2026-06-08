@@ -160,3 +160,48 @@ def test_category_htmx_returns_partial(authed):
     assert resp.status_code == 200
     assert "<html" not in resp.text
     assert "银行降息公告" in resp.text
+
+
+# ── Task 4: Item detail 测试 ───────────────────────────────────────────────────
+def test_item_detail_200(authed):
+    db = _Session()
+    item = db.query(Item).first()
+    item_id = item.id
+    db.close()
+    resp = authed.get(f"/item/{item_id}")
+    assert resp.status_code == 200
+
+
+def test_item_detail_shows_title(authed):
+    db = _Session()
+    item = db.query(Item).first()
+    item_id, title = item.id, item.title
+    db.close()
+    resp = authed.get(f"/item/{item_id}")
+    assert title in resp.text
+
+
+def test_item_detail_shows_summary(authed):
+    db = _Session()
+    item = db.query(Item).filter(Item.summary_zh.isnot(None)).first()
+    item_id, summary = item.id, item.summary_zh
+    db.close()
+    resp = authed.get(f"/item/{item_id}")
+    assert summary in resp.text
+
+
+def test_item_toggle_read(authed):
+    db = _Session()
+    item = db.query(Item).first()
+    item_id, original = item.id, item.is_read
+    db.close()
+    authed.post(f"/item/{item_id}/toggle", data={"field": "is_read"})
+    db = _Session()
+    updated = db.query(Item).filter_by(id=item_id).first()
+    assert updated.is_read != original
+    db.close()
+
+
+def test_item_not_found(authed):
+    resp = authed.get("/item/99999")
+    assert resp.status_code == 404

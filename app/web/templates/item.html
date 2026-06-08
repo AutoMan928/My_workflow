@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }} · 资讯平台{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border p-6 max-w-2xl">
+  <div class="flex items-start gap-3 mb-4 flex-wrap">
+    {% if item.is_key %}<span class="text-xs bg-red-500 text-white rounded px-1.5 py-0.5 mt-0.5">重点</span>{% endif %}
+    {% if item.content_tag %}<span class="text-xs bg-gray-100 text-gray-500 rounded px-1.5 py-0.5 mt-0.5">{{ item.content_tag }}</span>{% endif %}
+    <h1 class="text-xl font-bold leading-tight w-full">{{ item.title }}</h1>
+  </div>
+
+  <div class="flex gap-2 mb-6 flex-wrap">
+    <button hx-post="/item/{{ item.id }}/toggle" hx-vals='{"field":"is_read"}'
+            hx-target="this" hx-swap="outerHTML"
+            class="rounded px-3 py-1 text-sm {{ 'bg-gray-700 text-white' if item.is_read else 'bg-white text-gray-700 border' }}">
+      {{ "已读" if item.is_read else "标为已读" }}
+    </button>
+    <button hx-post="/item/{{ item.id }}/toggle" hx-vals='{"field":"is_saved"}'
+            hx-target="this" hx-swap="outerHTML"
+            class="rounded px-3 py-1 text-sm {{ 'bg-gray-700 text-white' if item.is_saved else 'bg-white text-gray-700 border' }}">
+      {{ "已收藏" if item.is_saved else "收藏" }}
+    </button>
+    <a href="{{ item.url }}" target="_blank" rel="noopener"
+       class="ml-auto rounded px-3 py-1 text-sm bg-blue-600 text-white hover:bg-blue-700">
+      原文 ↗
+    </a>
+  </div>
+
+  {% if item.summary_zh %}
+  <div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-500 mb-2">AI 摘要</h2>
+    <p class="text-gray-800 leading-relaxed">{{ item.summary_zh }}</p>
+  </div>
+  {% endif %}
+
+  {% if item.score %}
+  <p class="text-sm text-gray-500 mb-4">评分：<span class="font-medium text-blue-600">{{ "%.1f"|format(item.score) }}</span></p>
+  {% endif %}
+
+  {% if item.ai_extra %}
+  <div class="mt-4 border-t pt-4 flex flex-col gap-3">
+    <h2 class="text-sm font-semibold text-gray-500">AI 分析</h2>
+    {% if item.ai_extra.get("work_impact") %}
+    <div><span class="text-xs text-gray-400">工作影响</span><p class="text-gray-800 text-sm mt-1">{{ item.ai_extra["work_impact"] }}</p></div>
+    {% endif %}
+    {% if item.ai_extra.get("entry_advice") %}
+    <div><span class="text-xs text-gray-400">切入建议</span><p class="text-gray-800 text-sm mt-1">{{ item.ai_extra["entry_advice"] }}</p></div>
+    {% endif %}
+    {% if item.ai_extra.get("ai_approach") %}
+    <div><span class="text-xs text-gray-400">AI 做法</span><p class="text-gray-800 text-sm mt-1">{{ item.ai_extra["ai_approach"] }}</p></div>
+    {% endif %}
+    {% if item.ai_extra.get("monetization") %}
+    <div><span class="text-xs text-gray-400">变现路径</span><p class="text-gray-800 text-sm mt-1">{{ item.ai_extra["monetization"] }}</p></div>
+    {% endif %}
+    {% if item.ai_extra.get("fit_score") %}
+    <p class="text-sm text-gray-500">适合度：<span class="font-medium text-blue-600">{{ item.ai_extra["fit_score"] }}</span></p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if item.fetched_at %}
+  <p class="text-xs text-gray-400 mt-6">抓取时间：{{ item.fetched_at.strftime("%Y-%m-%d %H:%M") }}</p>
+  {% endif %}
+</div>
+{% endblock %}
