@@ -238,3 +238,35 @@ def test_search_unauthenticated_redirects():
         resp = client.get("/search", follow_redirects=False)
     assert resp.status_code == 302
     assert "/login" in resp.headers["location"]
+
+
+# ── Task 6: Archive + Report 测试 ─────────────────────────────────────────────
+def test_archive_200(authed):
+    resp = authed.get("/archive")
+    assert resp.status_code == 200
+
+
+def test_archive_shows_today(authed):
+    from datetime import date
+    today = date.today().strftime("%Y-%m-%d")
+    resp = authed.get("/archive")
+    assert today in resp.text
+
+
+def test_report_200(authed):
+    from datetime import date
+    today = date.today().strftime("%Y-%m-%d")
+    resp = authed.get(f"/report/morning/{today}")
+    assert resp.status_code == 200
+
+
+def test_report_shows_pushed_items(authed):
+    from datetime import date
+    today = date.today().strftime("%Y-%m-%d")
+    resp = authed.get(f"/report/morning/{today}")
+    assert "银行降息公告" in resp.text
+
+
+def test_report_invalid_slot_404(authed):
+    resp = authed.get("/report/weekly/2026-01-01")
+    assert resp.status_code == 404

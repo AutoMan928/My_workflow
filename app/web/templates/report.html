@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ date }} {{ slot_label }}报 · 资讯平台{% endblock %}
+{% block content %}
+<h1 class="text-xl font-bold mb-2">{{ date }} · {{ slot_label }}资讯速报</h1>
+<p class="text-sm text-gray-500 mb-6">共 {{ items|length }} 条内容</p>
+{% if not items %}
+  <p class="text-gray-400">本次暂无推送记录</p>
+{% else %}
+<div class="flex flex-col gap-2">
+  {% for item in items %}
+  <a href="/item/{{ item.id }}"
+     class="bg-white rounded-lg border px-4 py-3 hover:shadow-sm transition">
+    <div class="flex items-center gap-2">
+      {% if item.is_key %}<span class="text-xs bg-red-500 text-white rounded px-1.5 py-0.5">重点</span>{% endif %}
+      <span class="text-xs text-gray-400 shrink-0">{{ item.category_slug }}</span>
+      <span class="font-medium text-gray-900">{{ item.title }}</span>
+    </div>
+    {% if item.summary_zh %}
+    <p class="text-sm text-gray-500 mt-1 line-clamp-1">{{ item.summary_zh }}</p>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
