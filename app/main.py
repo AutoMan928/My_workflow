@@ -1,8 +1,17 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from app.web.routes import auth, home, category, item, search, archive, admin
 
-app = FastAPI(title="News Platform", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    from app.models.base import init_db
+    init_db()
+    yield
+
+
+app = FastAPI(title="News Platform", version="0.1.0", lifespan=lifespan)
 app.include_router(auth.router)
 app.include_router(home.router)
 app.include_router(category.router)
