@@ -100,6 +100,7 @@ def test_login_correct_password(anon):
     resp = anon.post("/login", data={"password": "testpassword"}, follow_redirects=False)
     assert resp.status_code == 302
     assert COOKIE_NAME in resp.cookies
+    assert resp.headers["location"] in ("/", "http://testserver/")
 
 
 def test_logout(authed):
