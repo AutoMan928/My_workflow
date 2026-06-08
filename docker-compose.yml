@@ -9,7 +9,7 @@ services:
     env_file: .env
     environment:
       # 覆盖 .env 中的值，使用 Docker 内部服务名访问 RSSHub
-      - RSSHUB_BASE_URL=http://rsshub:1200
+      - RSSHUB_BASE_URL=rsshub:1200
     volumes:
       - ./data:/app/data
       - ./config.yaml:/app/config.yaml
