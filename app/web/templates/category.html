@@ -1,16 +1,18 @@
 {% extends "base.html" %}
-{% block title %}{{ label }} · 资讯平台{% endblock %}
+{% block title %}{{ label }} · 每日精选{% endblock %}
 {% block content %}
-<div class="flex items-center gap-4 mb-6">
-  <h1 class="text-xl font-bold">{{ label }}</h1>
-  <label class="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
+
+<div class="flex items-baseline justify-between pb-3 border-b border-stone-200 mb-1">
+  <h1 class="serif text-base font-semibold text-stone-800 tracking-wide">{{ label }}</h1>
+  <label class="flex items-center gap-2 text-xs text-stone-400 cursor-pointer">
     <input type="checkbox" {% if only_key %}checked{% endif %}
-           onchange="location.href='/category/{{ slug }}?only_key='+this.checked"
-           class="rounded" />
+           onchange="location.href='/category/{{ slug }}?only_key='+this.checked" />
     仅重点
   </label>
 </div>
-<div id="item-list" class="flex flex-col gap-2">
+
+<div id="item-list" class="divide-y divide-stone-100">
   {% include "_items_partial.html" %}
 </div>
+
 {% endblock %}

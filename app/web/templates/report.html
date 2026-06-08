@@ -1,25 +1,36 @@
 {% extends "base.html" %}
-{% block title %}{{ date }} {{ slot_label }}报 · 资讯平台{% endblock %}
+{% block title %}{{ date }} {{ slot_label }}报 · 每日精选{% endblock %}
 {% block content %}
-<h1 class="text-xl font-bold mb-2">{{ date }} · {{ slot_label }}资讯速报</h1>
-<p class="text-sm text-gray-500 mb-6">共 {{ items|length }} 条内容</p>
-{% if not items %}
-  <p class="text-gray-400">本次暂无推送记录</p>
-{% else %}
-<div class="flex flex-col gap-2">
-  {% for item in items %}
-  <a href="/item/{{ item.id }}"
-     class="bg-white rounded-lg border px-4 py-3 hover:shadow-sm transition">
-    <div class="flex items-center gap-2">
-      {% if item.is_key %}<span class="text-xs bg-red-500 text-white rounded px-1.5 py-0.5">重点</span>{% endif %}
-      <span class="text-xs text-gray-400 shrink-0">{{ item.category_slug }}</span>
-      <span class="font-medium text-gray-900">{{ item.title }}</span>
-    </div>
-    {% if item.summary_zh %}
-    <p class="text-sm text-gray-500 mt-1 line-clamp-1">{{ item.summary_zh }}</p>
-    {% endif %}
-  </a>
-  {% endfor %}
+
+<div class="max-w-2xl">
+  <div class="pb-3 border-b border-stone-200 mb-1">
+    <h1 class="serif text-base font-semibold text-stone-800 tracking-wide">{{ date }} · {{ slot_label }}资讯速报</h1>
+    <p class="text-xs text-stone-400 mt-1 font-light">共 {{ items|length }} 条内容</p>
+  </div>
+
+  {% if not items %}
+  <p class="text-stone-300 text-sm text-center py-16">本次暂无推送记录</p>
+  {% else %}
+  <div class="divide-y divide-stone-100">
+    {% for item in items %}
+    <a href="/item/{{ item.id }}" class="item-row flex items-start gap-3 py-3.5 -mx-2 px-2 rounded">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          {% if item.is_key %}
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+          {% endif %}
+          <span class="text-xs text-stone-400 shrink-0 font-light">{{ item.category_slug }}</span>
+          <span class="text-sm font-medium text-stone-800 leading-snug">{{ item.title }}</span>
+        </div>
+        {% if item.summary_zh %}
+        <p class="text-xs text-stone-400 mt-1 line-clamp-1 leading-relaxed
+                  {{ 'pl-3.5' if item.is_key else '' }}">{{ item.summary_zh }}</p>
+        {% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
 </div>
-{% endif %}
+
 {% endblock %}

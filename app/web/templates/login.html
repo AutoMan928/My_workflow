@@ -1,16 +1,23 @@
 {% extends "base.html" %}
-{% block title %}登录{% endblock %}
+{% block title %}登录 · 每日精选{% endblock %}
 {% block content %}
-<div class="max-w-sm mx-auto mt-20">
-  <h1 class="text-2xl font-bold text-center mb-8">📰 资讯平台</h1>
-  <form method="post" action="/login" class="bg-white rounded-xl shadow p-8 flex flex-col gap-4">
-    {% if error %}<p class="text-red-500 text-sm text-center">{{ error }}</p>{% endif %}
-    <input type="password" name="password" placeholder="密码"
-           class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+<div class="max-w-xs mx-auto" style="margin-top:6rem">
+  <div class="text-center mb-10">
+    <h1 class="serif text-2xl font-semibold text-stone-800 tracking-widest uppercase">每日精选</h1>
+    <p class="text-stone-400 text-xs mt-2 tracking-wide">私人资讯平台</p>
+  </div>
+  <form method="post" action="/login" class="flex flex-col gap-3">
+    {% if error %}
+    <p class="text-red-400 text-xs text-center">{{ error }}</p>
+    {% endif %}
+    <input type="password" name="password" placeholder="访问密码"
+           class="border border-stone-200 bg-white rounded-lg px-4 py-3 text-sm
+                  focus:outline-none focus:border-stone-400 placeholder-stone-300 transition-colors"
            autofocus required />
     <button type="submit"
-            class="bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 transition">
-      登录
+            class="bg-stone-800 text-white rounded-lg py-3 text-xs tracking-widest
+                   hover:bg-stone-900 transition-colors uppercase">
+      进入
     </button>
   </form>
 </div>

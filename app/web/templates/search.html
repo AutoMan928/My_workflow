@@ -1,33 +1,47 @@
 {% extends "base.html" %}
-{% block title %}搜索 · 资讯平台{% endblock %}
+{% block title %}搜索 · 每日精选{% endblock %}
 {% block content %}
-<h1 class="text-xl font-bold mb-6">全文搜索</h1>
-<form method="get" action="/search" class="flex gap-2 mb-6">
-  <input type="text" name="q" value="{{ q }}" placeholder="输入关键词…"
-         class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-         autofocus />
-  <button type="submit" class="bg-blue-600 text-white rounded-lg px-5 py-2 hover:bg-blue-700">搜索</button>
-</form>
 
-{% if q %}
-  {% if items %}
-    <p class="text-sm text-gray-500 mb-4">找到 {{ items|length }} 条结果</p>
-    <div class="flex flex-col gap-2">
+<div class="max-w-2xl">
+  <h1 class="serif text-base font-semibold text-stone-800 tracking-wide pb-3 border-b border-stone-200 mb-6">搜索</h1>
+
+  <form method="get" action="/search" class="flex gap-2 mb-8">
+    <input type="text" name="q" value="{{ q }}" placeholder="输入关键词…"
+           class="flex-1 border border-stone-200 bg-white rounded-lg px-4 py-2.5 text-sm
+                  focus:outline-none focus:border-stone-400 placeholder-stone-300 transition-colors"
+           autofocus />
+    <button type="submit"
+            class="bg-stone-800 text-white rounded-lg px-5 py-2.5 text-xs tracking-widest
+                   hover:bg-stone-900 transition-colors uppercase">
+      搜索
+    </button>
+  </form>
+
+  {% if q %}
+    {% if items %}
+    <p class="text-xs text-stone-400 mb-4 tracking-wide">共 {{ items|length }} 条结果</p>
+    <div class="divide-y divide-stone-100">
       {% for item in items %}
-      <a href="/item/{{ item.id }}"
-         class="bg-white rounded-lg border px-4 py-3 hover:shadow-sm transition">
-        <div class="flex items-center gap-2">
-          {% if item.is_key %}<span class="text-xs bg-red-500 text-white rounded px-1.5 py-0.5">重点</span>{% endif %}
-          <span class="font-medium text-gray-900">{{ item.title }}</span>
+      <a href="/item/{{ item.id }}" class="item-row flex items-start gap-3 py-3.5 -mx-2 px-2 rounded">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            {% if item.is_key %}
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+            {% endif %}
+            <span class="text-sm font-medium text-stone-800 leading-snug">{{ item.title }}</span>
+          </div>
+          {% if item.summary_zh %}
+          <p class="text-xs text-stone-400 mt-1 line-clamp-1 leading-relaxed
+                    {{ 'pl-3.5' if item.is_key else '' }}">{{ item.summary_zh }}</p>
+          {% endif %}
         </div>
-        {% if item.summary_zh %}
-        <p class="text-sm text-gray-500 mt-1 line-clamp-1">{{ item.summary_zh }}</p>
-        {% endif %}
       </a>
       {% endfor %}
     </div>
-  {% else %}
-    <p class="text-gray-400">没有找到与「{{ q }}」相关的内容</p>
+    {% else %}
+    <p class="text-stone-300 text-sm text-center py-16">没有找到与「{{ q }}」相关的内容</p>
+    {% endif %}
   {% endif %}
-{% endif %}
+</div>
+
 {% endblock %}

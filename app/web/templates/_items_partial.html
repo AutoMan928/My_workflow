@@ -1,24 +1,29 @@
 {% for item in items %}
 <a href="/item/{{ item.id }}"
-   class="bg-white rounded-lg border px-4 py-3 hover:shadow-sm transition flex items-start gap-3
-          {{ 'opacity-60' if item.is_read else '' }}">
+   class="item-row flex items-start gap-3 py-3.5 -mx-2 px-2 rounded
+          {{ 'opacity-40' if item.is_read else '' }}">
   <div class="flex-1 min-w-0">
     <div class="flex items-center gap-2">
       {% if item.is_key %}
-      <span class="text-xs bg-red-500 text-white rounded px-1.5 py-0.5 shrink-0">重点</span>
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
       {% endif %}
-      {% if item.content_tag %}
-      <span class="text-xs bg-gray-100 text-gray-500 rounded px-1.5 py-0.5 shrink-0">{{ item.content_tag }}</span>
-      {% endif %}
-      <span class="font-medium text-gray-900 truncate">{{ item.title }}</span>
+      <span class="text-sm font-medium text-stone-800 leading-snug">{{ item.title }}</span>
     </div>
     {% if item.summary_zh %}
-    <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ item.summary_zh }}</p>
+    <p class="text-xs text-stone-400 mt-1 line-clamp-2 leading-relaxed
+              {{ 'pl-3.5' if item.is_key else '' }}">{{ item.summary_zh }}</p>
     {% endif %}
-    <p class="text-xs text-gray-400 mt-1">{{ item.fetched_at.strftime("%m-%d %H:%M") if item.fetched_at else "" }}</p>
+    <div class="flex items-center gap-2 mt-1.5 {{ 'pl-3.5' if item.is_key else '' }}">
+      <span class="text-xs text-stone-300 font-light">
+        {{ item.fetched_at.strftime("%m月%d日 %H:%M") if item.fetched_at else "" }}
+      </span>
+      {% if item.content_tag %}
+      <span class="bg-stone-100 text-stone-400 px-1.5 py-0.5 rounded text-xs">{{ item.content_tag }}</span>
+      {% endif %}
+    </div>
   </div>
   {% if item.score %}
-  <span class="text-sm font-medium text-blue-500 shrink-0">{{ "%.1f"|format(item.score) }}</span>
+  <span class="text-xs text-stone-300 shrink-0 pt-0.5 font-light">{{ "%.1f"|format(item.score) }}</span>
   {% endif %}
 </a>
 {% endfor %}
@@ -30,7 +35,7 @@
      hx-target="#load-more-trigger"
      hx-swap="outerHTML"
      hx-headers='{"HX-Request": "true"}'
-     class="py-4 text-center text-gray-400 text-sm">
-  加载更多...
+     class="py-8 text-center text-stone-300 text-xs tracking-widest">
+  · · ·
 </div>
 {% endif %}

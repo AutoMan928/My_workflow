@@ -3,25 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}资讯平台{% endblock %}</title>
+  <title>{% block title %}每日精选{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Noto Serif SC"', 'Georgia', 'serif'],
+            sans:  ['"Noto Sans SC"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <style>
+    body { font-family: 'Noto Sans SC', system-ui, sans-serif; }
+    .serif { font-family: 'Noto Serif SC', Georgia, serif; }
+    .item-row { transition: background-color 0.12s ease; }
+    .item-row:hover { background-color: #fafaf9; }
+    input[type="checkbox"] { accent-color: #b45309; }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-  <nav class="bg-white border-b px-6 py-3 flex items-center gap-4 text-sm sticky top-0 z-10 shadow-sm">
-    <a href="/" class="font-bold text-base">📰 资讯</a>
-    <a href="/category/banking" class="text-gray-600 hover:text-gray-900">银行运营</a>
-    <a href="/category/tech" class="text-gray-600 hover:text-gray-900">技术AI</a>
-    <a href="/category/startup" class="text-gray-600 hover:text-gray-900">创业</a>
-    <a href="/search" class="text-gray-600 hover:text-gray-900">🔍 搜索</a>
-    <a href="/archive" class="text-gray-600 hover:text-gray-900">📅 归档</a>
-    <div class="ml-auto flex gap-4">
-      <a href="/admin/sources" class="text-gray-400 hover:text-gray-600">⚙️</a>
-      <a href="/logout" class="text-gray-400 hover:text-gray-600">退出</a>
+<body class="bg-stone-50 min-h-screen text-stone-900">
+
+  <nav class="bg-white border-b border-stone-200 sticky top-0 z-10">
+    <div class="max-w-4xl mx-auto px-6 flex items-center gap-5" style="height:52px">
+      <a href="/" class="serif text-sm font-semibold tracking-widest text-stone-800 uppercase">每日精选</a>
+      <span class="w-px h-3.5 bg-stone-200 shrink-0"></span>
+      <div class="flex items-center gap-5 text-xs tracking-wide">
+        <a href="/category/banking" class="text-stone-500 hover:text-stone-900 transition-colors">银行运营</a>
+        <a href="/category/tech"    class="text-stone-500 hover:text-stone-900 transition-colors">技术 AI</a>
+        <a href="/category/startup" class="text-stone-500 hover:text-stone-900 transition-colors">创业</a>
+      </div>
+      <div class="ml-auto flex items-center gap-5 text-xs tracking-wide">
+        <a href="/search"        class="text-stone-400 hover:text-stone-700 transition-colors">搜索</a>
+        <a href="/archive"       class="text-stone-400 hover:text-stone-700 transition-colors">归档</a>
+        <a href="/admin/sources" class="text-stone-300 hover:text-stone-600 transition-colors">⚙</a>
+        <a href="/logout"        class="text-stone-300 hover:text-stone-600 transition-colors">退出</a>
+      </div>
     </div>
   </nav>
-  <main class="max-w-4xl mx-auto px-4 py-6">
+
+  <main class="max-w-4xl mx-auto px-6 py-10">
     {% block content %}{% endblock %}
   </main>
+
 </body>
 </html>

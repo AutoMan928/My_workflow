@@ -1,21 +1,24 @@
 {% extends "base.html" %}
-{% block title %}归档 · 资讯平台{% endblock %}
+{% block title %}归档 · 每日精选{% endblock %}
 {% block content %}
-<h1 class="text-xl font-bold mb-6">📅 内容归档</h1>
+
+<h1 class="serif text-base font-semibold text-stone-800 tracking-wide pb-3 border-b border-stone-200 mb-8">内容归档</h1>
+
 {% if not date_counts %}
-  <p class="text-gray-400">暂无内容</p>
+<p class="text-stone-300 text-sm text-center py-16">暂无内容</p>
 {% else %}
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
   {% for row in date_counts %}
-  <div class="bg-white rounded-lg border p-4 hover:shadow-sm">
-    <p class="font-medium text-gray-800">{{ row.d }}</p>
-    <p class="text-sm text-gray-400 mt-1">{{ row.cnt }} 条内容</p>
-    <div class="flex gap-3 mt-3 text-xs">
-      <a href="/report/morning/{{ row.d }}" class="text-blue-500 hover:underline">早间报</a>
-      <a href="/report/evening/{{ row.d }}" class="text-blue-500 hover:underline">晚间报</a>
+  <div class="bg-white border border-stone-100 rounded-xl p-4 hover:border-stone-200 transition-colors">
+    <p class="serif font-semibold text-stone-800 text-sm">{{ row.d }}</p>
+    <p class="text-xs text-stone-400 mt-1 mb-3 font-light">{{ row.cnt }} 篇</p>
+    <div class="flex gap-3 text-xs">
+      <a href="/report/morning/{{ row.d }}" class="text-amber-600 hover:text-amber-800 transition-colors">早间</a>
+      <a href="/report/evening/{{ row.d }}" class="text-amber-600 hover:text-amber-800 transition-colors">晚间</a>
     </div>
   </div>
   {% endfor %}
 </div>
 {% endif %}
+
 {% endblock %}
