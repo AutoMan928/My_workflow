@@ -4,7 +4,7 @@ WORKDIR /app
 
 # 先复制依赖文件，利用 Docker layer 缓存
 COPY pyproject.toml .
-RUN pip install --no-cache-dir -e . || true
+RUN pip install --no-cache-dir -e .
 
 # 复制应用代码
 COPY app/ app/
