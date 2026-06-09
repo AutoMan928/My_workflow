@@ -32,7 +32,7 @@
 
 {% if has_more %}
 <div id="load-more-trigger"
-     hx-get="/category/{{ slug }}?page={{ next_page }}{% if only_key %}&only_key=true{% endif %}"
+     hx-get="/category/{{ slug }}?page={{ next_page }}{% if only_key %}&only_key=true{% endif %}{% if period %}&period={{ period }}{% endif %}"
      hx-trigger="revealed"
      hx-target="#load-more-trigger"
      hx-swap="outerHTML"

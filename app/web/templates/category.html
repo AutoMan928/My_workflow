@@ -2,13 +2,24 @@
 {% block title %}{{ label }} · 每日精选{% endblock %}
 {% block content %}
 
-<div class="flex items-baseline justify-between pb-3 border-b border-stone-200 mb-1">
+<div class="flex items-baseline justify-between pb-3 border-b border-stone-200 mb-3">
   <h1 class="serif text-base font-semibold text-stone-800 tracking-wide">{{ label }}</h1>
   <label class="flex items-center gap-2 text-xs text-stone-400 cursor-pointer">
     <input type="checkbox" {% if only_key %}checked{% endif %}
-           onchange="location.href='/category/{{ slug }}?only_key='+this.checked" />
+           onchange="location.href='/category/{{ slug }}?only_key='+this.checked+'&period={{ period }}'" />
     仅重点
   </label>
+</div>
+
+<!-- 时间筛选 tabs -->
+<div class="flex gap-1 mb-4">
+  {% for tab_period, tab_label in [('', '全部'), ('today', '今天'), ('week', '本周'), ('month', '本月')] %}
+  <a href="/category/{{ slug }}?period={{ tab_period }}{% if only_key %}&only_key=true{% endif %}"
+     class="text-xs px-3 py-1 rounded-full transition-colors
+            {% if period == tab_period %}bg-stone-800 text-white{% else %}bg-stone-100 text-stone-500 hover:bg-stone-200{% endif %}">
+    {{ tab_label }}
+  </a>
+  {% endfor %}
 </div>
 
 <div id="item-list" class="divide-y divide-stone-100">

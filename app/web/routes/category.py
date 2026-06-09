@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import desc
@@ -18,6 +20,8 @@ _CATEGORY_LABELS = {
     "github_trending": "GitHub 热门趋势",
 }
 
+_PERIOD_DAYS = {"today": 1, "week": 7, "month": 30}
+
 
 @router.get("/category/{slug}", response_class=HTMLResponse)
 async def category_page(
@@ -25,6 +29,7 @@ async def category_page(
     request: Request,
     page: int = 0,
     only_key: bool = False,
+    period: str = "",
     db: Session = Depends(get_db),
 ):
     if not check_auth(request):
@@ -35,6 +40,10 @@ async def category_page(
     query = db.query(Item).filter(Item.category_slug == slug)
     if only_key:
         query = query.filter(Item.is_key.is_(True))
+    if period in _PERIOD_DAYS:
+        since = date.today() - timedelta(days=_PERIOD_DAYS[period] - 1)
+        query = query.filter(Item.fetched_at >= since)
+
     rows = query.order_by(desc(Item.fetched_at)).offset(page * _PAGE_SIZE).limit(_PAGE_SIZE + 1).all()
 
     has_more = len(rows) > _PAGE_SIZE
@@ -48,6 +57,7 @@ async def category_page(
         "next_page": page + 1,
         "has_more": has_more,
         "only_key": only_key,
+        "period": period,
     }
 
     if request.headers.get("HX-Request") == "true":

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ period_label }}总结 · 每日精选{% endblock %}
+{% block content %}
+
+<div class="max-w-2xl">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-3">
+      <h1 class="serif text-lg font-semibold text-stone-900 tracking-wide">
+        {{ period_label }}总结
+      </h1>
+      <div class="flex items-center gap-2">
+        <a href="/summary?period=week"
+           class="text-xs px-3 py-1 rounded-full transition-colors
+                  {% if period == 'week' %}bg-stone-800 text-white{% else %}bg-stone-100 text-stone-500 hover:bg-stone-200{% endif %}">
+          近一周
+        </a>
+        <a href="/summary?period=month"
+           class="text-xs px-3 py-1 rounded-full transition-colors
+                  {% if period == 'month' %}bg-stone-800 text-white{% else %}bg-stone-100 text-stone-500 hover:bg-stone-200{% endif %}">
+          近一个月
+        </a>
+      </div>
+    </div>
+    <p class="text-xs text-stone-400">
+      {{ since.strftime("%Y年%m月%d日") }} — {{ today.strftime("%Y年%m月%d日") }} · 各栏目评分最高的 10 条
+    </p>
+  </div>
+
+  {% if not sections %}
+  <div class="text-center py-20">
+    <p class="text-stone-300 text-sm">{{ period_label }}内暂无数据</p>
+    <p class="text-stone-200 text-xs mt-2">前往 <a href="/admin/sources" class="underline hover:text-stone-400">管理页</a> 运行 Pipeline</p>
+  </div>
+  {% endif %}
+
+  {% for section in sections %}
+  <div class="mb-10">
+
+    <!-- Section header -->
+    <div class="flex items-baseline gap-3 mb-4 pb-2 border-b border-stone-100">
+      <h2 class="serif text-sm font-semibold text-stone-700 tracking-wide">{{ section.label }}</h2>
+      <span class="text-xs text-stone-300 font-light">共 {{ section.total }} 条 · 展示评分最高 {{ section.items|length }} 条</span>
+      <a href="/category/{{ section.slug }}?period={{ period }}"
+         class="ml-auto text-xs text-stone-400 hover:text-stone-600 transition-colors">全部 →</a>
+    </div>
+
+    <!-- Items -->
+    <div class="flex flex-col gap-3">
+      {% for item in section.items %}
+      {% set title = (item.ai_extra or {}).get("title_zh") or item.title %}
+      <a href="/item/{{ item.id }}"
+         class="group block rounded-xl border border-stone-100 p-4 hover:border-stone-200 hover:bg-stone-50 transition-all">
+
+        <div class="flex items-start gap-2.5 mb-1.5">
+          {% if item.is_key %}
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5"></span>
+          {% else %}
+          <span class="w-1.5 h-1.5 shrink-0 mt-1.5"></span>
+          {% endif %}
+          <span class="text-sm font-medium text-stone-800 leading-snug group-hover:text-stone-900 flex-1">
+            {{ title }}
+          </span>
+          {% if item.score %}
+          <span class="text-xs text-stone-300 font-light shrink-0 pt-0.5">{{ "%.1f"|format(item.score) }}</span>
+          {% endif %}
+        </div>
+
+        {% if item.summary_zh %}
+        <p class="text-xs text-stone-500 leading-relaxed pl-4 line-clamp-2 mb-1.5">
+          {{ item.summary_zh }}
+        </p>
+        {% endif %}
+
+        <div class="flex items-center gap-2 pl-4">
+          {% if item.content_tag %}
+          <span class="bg-stone-100 text-stone-400 px-1.5 py-0.5 rounded text-xs">{{ item.content_tag }}</span>
+          {% endif %}
+          <span class="text-xs text-stone-300 font-light ml-auto">
+            {{ item.fetched_at.strftime("%m月%d日") if item.fetched_at else "" }}
+          </span>
+        </div>
+
+      </a>
+      {% endfor %}
+    </div>
+
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

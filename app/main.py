@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from app.web.routes import auth, home, category, item, search, archive, admin, report
+from app.web.routes import auth, home, category, item, search, archive, admin, report, summary
 
 
 @asynccontextmanager
@@ -22,6 +22,7 @@ app.include_router(search.router)
 app.include_router(archive.router)
 app.include_router(admin.router)
 app.include_router(report.router)
+app.include_router(summary.router)
 
 
 @app.get("/health")

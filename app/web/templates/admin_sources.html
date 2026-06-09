@@ -1,7 +1,24 @@
 {% extends "base.html" %}
 {% block title %}来源管理 · 资讯平台{% endblock %}
 {% block content %}
-<h1 class="text-xl font-bold mb-6">来源管理</h1>
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-xl font-bold">来源管理</h1>
+  <form method="post" action="/admin/run-pipeline" class="flex items-center gap-2">
+    <select name="slot" class="text-xs border border-stone-200 rounded px-2 py-1.5 bg-white text-stone-600">
+      <option value="morning">早间 (morning)</option>
+      <option value="evening">晚间 (evening)</option>
+    </select>
+    <button type="submit"
+            class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium rounded px-4 py-1.5 transition-colors">
+      立即运行 Pipeline
+    </button>
+  </form>
+</div>
+{% if request.query_params.get('triggered') %}
+<div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+  Pipeline 已在后台启动，通常需要 1-5 分钟完成，完成后刷新页面查看数据。
+</div>
+{% endif %}
 <div class="flex flex-col gap-3">
   {% set ns = namespace(prev_cat="") %}
   {% for s in sources %}

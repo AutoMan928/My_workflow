@@ -1,10 +1,29 @@
+import logging
 from pathlib import Path
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, BackgroundTasks, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 import yaml
 
 from app.config import get_config
 from app.web.deps import check_auth, templates
+
+logger = logging.getLogger(__name__)
+
+
+def _do_run_pipeline(slot: str) -> None:
+    try:
+        Path("data").mkdir(exist_ok=True)
+        from app.models.base import SessionLocal
+        from app.scheduler.pipeline import run_pipeline
+        cfg = get_config()
+        db = SessionLocal()
+        try:
+            summary = run_pipeline(slot, cfg.categories, db, cfg)
+            logger.info("Admin-triggered pipeline (%s) done: %s", slot, summary)
+        finally:
+            db.close()
+    except Exception as exc:
+        logger.error("Admin pipeline run (%s) failed: %s", slot, exc)
 
 router = APIRouter()
 _CONFIG_PATH = "config.yaml"
@@ -75,6 +94,18 @@ async def toggle_source(
     data["categories"] = cats
     _save_raw(data)
     return RedirectResponse(url="/admin/sources", status_code=302)
+
+
+@router.post("/admin/run-pipeline")
+async def admin_run_pipeline(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    slot: str = Form("morning"),
+):
+    if not check_auth(request):
+        return RedirectResponse(url="/login", status_code=302)
+    background_tasks.add_task(_do_run_pipeline, slot)
+    return RedirectResponse(url="/admin/sources?triggered=1", status_code=302)
 
 
 @router.post("/admin/sources/url")

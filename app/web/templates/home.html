@@ -23,7 +23,7 @@
           <p class="text-xs text-amber-800 mt-1 line-clamp-1 leading-relaxed">{{ item.summary_zh }}</p>
           {% endif %}
           <span class="text-xs text-amber-700 mt-0.5 inline-block">
-            {{ {"banking":"银行运营","tech":"技术AI","startup":"创业"}.get(item.category_slug, item.category_slug) }}
+            {{ {"banking":"银行运营","tech":"技术AI","startup":"创业","hualong":"画龙","github_trending":"GitHub趋势"}.get(item.category_slug, item.category_slug) }}
             {% if item.score %} · {{ "%.1f"|format(item.score) }}分{% endif %}
           </span>
         </div>
