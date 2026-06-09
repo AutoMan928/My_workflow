@@ -30,7 +30,9 @@ async def search(request: Request, q: str = "", db: Session = Depends(get_db)):
             if ids:
                 items = db.query(Item).filter(Item.id.in_(ids)).all()
         except Exception as exc:
-            logger.warning("FTS5 search failed for %r, falling back to LIKE: %s", q_clean, exc)
+            logger.warning("FTS5 search failed for %r: %s", q_clean, exc)
+
+        if not items:
             pattern = f"%{q_clean}%"
             title_zh_col = func.json_extract(Item.ai_extra, "$.title_zh")
             items = (

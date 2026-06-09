@@ -21,7 +21,7 @@ def _init_fts() -> None:
     with engine.begin() as conn:
         conn.execute(_sql_text("""
             CREATE VIRTUAL TABLE IF NOT EXISTS items_fts USING fts5(
-                title, content='items', content_rowid='id'
+                title, content='items', content_rowid='id', tokenize='trigram'
             )
         """))
         conn.execute(_sql_text("""
