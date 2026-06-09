@@ -21,18 +21,18 @@ def _init_fts() -> None:
     with engine.begin() as conn:
         conn.execute(_sql_text("""
             CREATE VIRTUAL TABLE IF NOT EXISTS items_fts USING fts5(
-                title, summary_zh, content='items', content_rowid='id'
+                title, content='items', content_rowid='id'
             )
         """))
         conn.execute(_sql_text("""
             CREATE TRIGGER IF NOT EXISTS items_ai AFTER INSERT ON items BEGIN
-                INSERT INTO items_fts(rowid, title, summary_zh)
-                VALUES (new.id, new.title, COALESCE(new.summary_zh, ''));
+                INSERT INTO items_fts(rowid, title)
+                VALUES (new.id, new.title);
             END
         """))
         conn.execute(_sql_text("""
-            INSERT OR IGNORE INTO items_fts(rowid, title, summary_zh)
-            SELECT id, title, COALESCE(summary_zh, '') FROM items
+            INSERT OR IGNORE INTO items_fts(rowid, title)
+            SELECT id, title FROM items
         """))
 
 
