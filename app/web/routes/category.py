@@ -14,6 +14,8 @@ _CATEGORY_LABELS = {
     "banking": "银行用户运营",
     "tech": "技术与AI工具",
     "startup": "个人创业",
+    "hualong": "画龙科技监控",
+    "github_trending": "GitHub 热门趋势",
 }
 
 
