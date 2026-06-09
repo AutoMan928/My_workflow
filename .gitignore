@@ -8,3 +8,5 @@ dist/
 .venv/
 venv/
 .gstack/
+node_modules/
+app/web/static/css/input.css

@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlalchemy import text
+from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session
 
 from app.models.base import get_db
@@ -32,9 +32,15 @@ async def search(request: Request, q: str = "", db: Session = Depends(get_db)):
         except Exception as exc:
             logger.warning("FTS5 search failed for %r, falling back to LIKE: %s", q_clean, exc)
             pattern = f"%{q_clean}%"
+            title_zh_col = func.json_extract(Item.ai_extra, "$.title_zh")
             items = (
                 db.query(Item)
-                .filter(Item.title.ilike(pattern) | Item.summary_zh.ilike(pattern))
+                .filter(
+                    or_(
+                        Item.title.ilike(pattern),
+                        title_zh_col.ilike(pattern),
+                    )
+                )
                 .limit(_SEARCH_LIMIT)
                 .all()
             )

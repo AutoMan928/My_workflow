@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from app.web.routes import auth, home, category, item, search, archive, admin, report
 
 
@@ -12,6 +13,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="News Platform", version="0.1.0", lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="app/web/static"), name="static")
 app.include_router(auth.router)
 app.include_router(home.router)
 app.include_router(category.router)

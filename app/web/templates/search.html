@@ -24,11 +24,12 @@
       {% for item in items %}
       <a href="/item/{{ item.id }}" class="item-row flex items-start gap-3 py-3.5 -mx-2 px-2 rounded">
         <div class="flex-1 min-w-0">
+          {% set display_title = (item.ai_extra or {}).get("title_zh") or item.title %}
           <div class="flex items-center gap-2">
             {% if item.is_key %}
             <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
             {% endif %}
-            <span class="text-sm font-medium text-stone-800 leading-snug">{{ item.title }}</span>
+            <span class="text-sm font-medium text-stone-800 leading-snug">{{ display_title }}</span>
           </div>
           {% if item.summary_zh %}
           <p class="text-xs text-stone-400 mt-1 line-clamp-1 leading-relaxed
