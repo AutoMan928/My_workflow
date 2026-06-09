@@ -2,6 +2,7 @@
 from app.ai.banking import process_banking_batch
 from app.ai.tech import process_tech_batch
 from app.ai.startup import process_startup_batch
+from app.ai.company import process_company_batch
 from app.config import CategoryConfig
 from app.fetchers.base import RawItem
 
@@ -10,6 +11,7 @@ _DEPTH_MAP = {
     "medium": process_tech_batch,
     "medium_deep": process_banking_batch,
     "deep": process_startup_batch,
+    "monitor": process_company_batch,
 }
 
 

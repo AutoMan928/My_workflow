@@ -33,3 +33,12 @@ class StartupResult(BaseModel):
     score: float
     is_key: bool
     ai_extra: StartupExtra
+
+
+class CompanyResult(BaseModel):
+    title_zh: str | None = None
+    summary_zh: str
+    score: float
+    is_key: bool
+    event_type: str | None = None
+    impact_zh: str | None = None

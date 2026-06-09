@@ -7,7 +7,7 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
-ResultType = Literal["banking", "tech", "startup"]
+ResultType = Literal["banking", "tech", "startup", "company"]
 
 DRY_RUN_RESPONSES: dict[str, dict] = {
     "banking": {
@@ -32,6 +32,14 @@ DRY_RUN_RESPONSES: dict[str, dict] = {
             "monetization": "【dry-run】订阅制，月费99元，预计6个月回本。",
             "entry_advice": "【dry-run】建议从微信小程序切入，先验证付费意愿。",
         },
+    },
+    "company": {
+        "title_zh": "【dry-run】企业动态测试",
+        "summary_zh": "【dry-run】公司完成新一轮融资，投资方为知名机构。",
+        "score": 8.0,
+        "is_key": True,
+        "event_type": "融资",
+        "impact_zh": "【dry-run】此轮融资将加速公司产品研发与市场扩张。",
     },
 }
 

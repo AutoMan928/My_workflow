@@ -2,6 +2,8 @@ from app.config import SourceConfig
 from app.fetchers.base import BaseFetcher
 from app.fetchers.rss import RssFetcher
 from app.fetchers.api_github import GithubFetcher
+from app.fetchers.api_github_trending import GitHubTrendingFetcher
+from app.fetchers.api_tianyancha import TianyanchaFetcher
 from app.fetchers.api_hn import HNFetcher
 from app.fetchers.api_ph import ProductHuntFetcher
 from app.fetchers.api_hf import HuggingFaceFetcher
@@ -10,6 +12,8 @@ from app.fetchers.scraper import ScraperFetcher
 REGISTRY: dict[str, type[BaseFetcher]] = {
     "rss": RssFetcher,
     "api_github": GithubFetcher,
+    "api_github_trending": GitHubTrendingFetcher,
+    "api_tianyancha": TianyanchaFetcher,
     "api_hn": HNFetcher,
     "api_ph": ProductHuntFetcher,
     "api_hf": HuggingFaceFetcher,

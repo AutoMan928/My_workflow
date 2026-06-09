@@ -123,3 +123,48 @@ categories:
         extra:
           story_type: show
           limit: 20
+
+  - name: 画龙科技监控
+    slug: hualong
+    depth_level: monitor
+    schedule: [morning]
+    enabled: true
+    min_save_score: 4.0
+    importance_rule:
+      is_key_threshold: 7.0
+      boost_tags: []
+    sources:
+      - name: Bing新闻·画龙
+        fetch_type: rss
+        feed_url: "https://cn.bing.com/news/search?q=上海画龙信息科技&format=RSS"
+        enabled: true
+        extra: {}
+      - name: 微博·画龙
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/weibo/keyword/画龙信息科技"
+        enabled: true
+        extra: {}
+      - name: 天眼查·画龙
+        fetch_type: api_tianyancha
+        feed_url: "https://www.tianyancha.com"
+        enabled: true
+        extra:
+          company_name: "上海画龙信息科技有限公司"
+
+  - name: GitHub 热门趋势
+    slug: github_trending
+    depth_level: medium
+    schedule: [morning]
+    enabled: true
+    min_save_score: 5.0
+    importance_rule:
+      is_key_threshold: 7.0
+      boost_tags: []
+    sources:
+      - name: GitHub Trending 日榜
+        fetch_type: api_github_trending
+        feed_url: "https://github.com/trending"
+        enabled: true
+        extra:
+          since: daily
+          limit: 20

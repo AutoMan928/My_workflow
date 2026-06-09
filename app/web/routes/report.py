@@ -27,6 +27,16 @@ _CATEGORY_META = {
         "insight_field": "entry_advice",
         "insight_label": "切入建议",
     },
+    "hualong": {
+        "label": "画龙科技监控",
+        "insight_field": "impact_zh",
+        "insight_label": "影响评估",
+    },
+    "github_trending": {
+        "label": "GitHub 热门趋势",
+        "insight_field": "tool_use_case",
+        "insight_label": "使用场景",
+    },
 }
 
 _TOP_N = 6
