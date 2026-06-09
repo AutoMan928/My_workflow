@@ -4,17 +4,19 @@
 
 <div class="flex items-baseline justify-between pb-3 border-b border-stone-200 mb-3">
   <h1 class="serif text-base font-semibold text-stone-800 tracking-wide">{{ label }}</h1>
+  {% if not summary_mode %}
   <label class="flex items-center gap-2 text-xs text-stone-400 cursor-pointer">
     <input type="checkbox" {% if only_key %}checked{% endif %}
            onchange="location.href='/category/{{ slug }}?only_key='+this.checked+'&period={{ period }}'" />
     仅重点
   </label>
+  {% endif %}
 </div>
 
 <!-- 时间筛选 tabs -->
 <div class="flex gap-1 mb-4">
   {% for tab_period, tab_label in [('', '全部'), ('today', '今天'), ('week', '本周'), ('month', '本月')] %}
-  <a href="/category/{{ slug }}?period={{ tab_period }}{% if only_key %}&only_key=true{% endif %}"
+  <a href="/category/{{ slug }}?period={{ tab_period }}{% if only_key and not tab_period %}&only_key=true{% endif %}"
      class="text-xs px-3 py-1 rounded-full transition-colors
             {% if period == tab_period %}bg-stone-800 text-white{% else %}bg-stone-100 text-stone-500 hover:bg-stone-200{% endif %}">
     {{ tab_label }}
@@ -22,8 +24,45 @@
   {% endfor %}
 </div>
 
+{% if summary_mode %}
+<!-- 总结模式提示 -->
+<p class="text-xs text-stone-400 mb-4">
+  按评分展示该时间段内最核心的资讯
+  {% if items or folded_items %}· 共 {{ items|length + folded_items|length }} 条{% endif %}
+</p>
+{% endif %}
+
 <div id="item-list" class="divide-y divide-stone-100">
   {% include "_items_partial.html" %}
 </div>
+
+{% if folded_items %}
+<!-- 低分资讯折叠区 -->
+<details class="mt-4 group">
+  <summary class="list-none flex items-center gap-2 py-3 cursor-pointer select-none text-xs text-stone-300 hover:text-stone-500 transition-colors">
+    <span class="flex-1 border-t border-stone-100"></span>
+    <span class="whitespace-nowrap px-2">还有 {{ folded_items|length }} 条次要资讯 ▾</span>
+    <span class="flex-1 border-t border-stone-100"></span>
+  </summary>
+  <div class="divide-y divide-stone-50 mt-1">
+    {% for item in folded_items %}
+    {% set title = (item.ai_extra or {}).get("title_zh") or item.title %}
+    {% set pub_time = (item.published_at or item.fetched_at) %}
+    <a href="/item/{{ item.id }}"
+       class="flex items-center gap-3 py-2 -mx-2 px-2 rounded opacity-45 hover:opacity-70 transition-opacity">
+      <div class="flex-1 min-w-0">
+        <span class="text-xs text-stone-600 leading-snug truncate block">{{ title }}</span>
+      </div>
+      <span class="text-xs text-stone-300 shrink-0 font-light">
+        {{ pub_time.strftime("%m月%d日") if pub_time else "" }}
+      </span>
+      {% if item.score %}
+      <span class="text-xs text-stone-200 shrink-0 font-light w-6 text-right">{{ "%.0f"|format(item.score) }}</span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</details>
+{% endif %}
 
 {% endblock %}

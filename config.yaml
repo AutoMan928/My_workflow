@@ -134,14 +134,24 @@ categories:
       is_key_threshold: 7.0
       boost_tags: []
     sources:
-      - name: 百度新闻·画龙
+      - name: 百度新闻·画龙信息科技
         fetch_type: rss
         feed_url: "http://{RSSHUB_BASE_URL}/baidu/search/画龙信息科技"
         enabled: true
         extra: {}
-      - name: 搜狗新闻·画龙
+      - name: 百度新闻·画龙科技
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/baidu/search/画龙科技"
+        enabled: true
+        extra: {}
+      - name: 搜狗新闻·画龙信息科技
         fetch_type: rss
         feed_url: "http://{RSSHUB_BASE_URL}/sogou/search/画龙信息科技"
+        enabled: true
+        extra: {}
+      - name: 搜狗新闻·上海画龙
+        fetch_type: rss
+        feed_url: "http://{RSSHUB_BASE_URL}/sogou/search/上海画龙"
         enabled: true
         extra: {}
       - name: 天眼查·画龙

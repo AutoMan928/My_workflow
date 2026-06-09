@@ -57,7 +57,7 @@ async def summary_page(
             sections.append({
                 "slug": slug,
                 "label": label,
-                "items": items,
+                "top_items": items,
                 "total": total,
             })
 

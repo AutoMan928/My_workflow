@@ -41,14 +41,14 @@
     <!-- Section header -->
     <div class="flex items-baseline gap-3 mb-4 pb-2 border-b border-stone-100">
       <h2 class="serif text-sm font-semibold text-stone-700 tracking-wide">{{ section.label }}</h2>
-      <span class="text-xs text-stone-300 font-light">共 {{ section.total }} 条 · 展示评分最高 {{ section.items|length }} 条</span>
+      <span class="text-xs text-stone-300 font-light">共 {{ section.total }} 条 · 展示评分最高 {{ section.top_items|length }} 条</span>
       <a href="/category/{{ section.slug }}?period={{ period }}"
          class="ml-auto text-xs text-stone-400 hover:text-stone-600 transition-colors">全部 →</a>
     </div>
 
     <!-- Items -->
     <div class="flex flex-col gap-3">
-      {% for item in section.items %}
+      {% for item in section.top_items %}
       {% set title = (item.ai_extra or {}).get("title_zh") or item.title %}
       <a href="/item/{{ item.id }}"
          class="group block rounded-xl border border-stone-100 p-4 hover:border-stone-200 hover:bg-stone-50 transition-all">
@@ -78,7 +78,7 @@
           <span class="bg-stone-100 text-stone-400 px-1.5 py-0.5 rounded text-xs">{{ item.content_tag }}</span>
           {% endif %}
           <span class="text-xs text-stone-300 font-light ml-auto">
-            {{ item.fetched_at.strftime("%m月%d日") if item.fetched_at else "" }}
+            {{ (item.published_at or item.fetched_at).strftime("%m月%d日") if (item.published_at or item.fetched_at) else "" }}
           </span>
         </div>
 

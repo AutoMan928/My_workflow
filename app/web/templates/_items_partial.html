@@ -17,7 +17,7 @@
     {% endif %}
     <div class="flex items-center gap-2 mt-1.5 {{ 'pl-3.5' if item.is_key else '' }}">
       <span class="text-xs text-stone-300 font-light">
-        {{ item.fetched_at.strftime("%m月%d日 %H:%M") if item.fetched_at else "" }}
+        {{ (item.published_at or item.fetched_at).strftime("%m月%d日 %H:%M") if (item.published_at or item.fetched_at) else "" }}
       </span>
       {% if item.content_tag %}
       <span class="bg-stone-100 text-stone-400 px-1.5 py-0.5 rounded text-xs">{{ item.content_tag }}</span>

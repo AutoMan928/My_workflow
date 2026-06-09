@@ -12,6 +12,8 @@ from app.web.deps import check_auth, templates
 router = APIRouter()
 
 _PAGE_SIZE = 20
+_FOLD_THRESHOLD = 5.5  # score below this gets folded into collapsible section
+
 _CATEGORY_LABELS = {
     "banking": "银行用户运营",
     "tech": "技术与AI工具",
@@ -40,24 +42,35 @@ async def category_page(
     query = db.query(Item).filter(Item.category_slug == slug)
     if only_key:
         query = query.filter(Item.is_key.is_(True))
-    if period in _PERIOD_DAYS:
+
+    summary_mode = period in _PERIOD_DAYS
+    if summary_mode:
+        # Time-range summary: filter by date, sort by score descending
         since = date.today() - timedelta(days=_PERIOD_DAYS[period] - 1)
         query = query.filter(Item.fetched_at >= since)
+        all_rows = query.order_by(desc(Item.score)).all()
+    else:
+        # Timeline mode: sort by fetched_at descending, paginate
+        all_rows = query.order_by(desc(Item.fetched_at)).all()
 
-    rows = query.order_by(desc(Item.fetched_at)).offset(page * _PAGE_SIZE).limit(_PAGE_SIZE + 1).all()
+    # Split into key/normal (visible) vs low-score (folded)
+    visible = [x for x in all_rows if x.is_key or (x.score or 0) >= _FOLD_THRESHOLD]
+    folded = [x for x in all_rows if not x.is_key and (x.score or 0) < _FOLD_THRESHOLD]
 
-    has_more = len(rows) > _PAGE_SIZE
-    items = rows[:_PAGE_SIZE]
+    has_more = len(visible) > (page + 1) * _PAGE_SIZE
+    items = visible[page * _PAGE_SIZE: (page + 1) * _PAGE_SIZE]
 
     ctx = {
         "slug": slug,
         "label": _CATEGORY_LABELS[slug],
         "items": items,
+        "folded_items": folded if page == 0 else [],
         "page": page,
         "next_page": page + 1,
         "has_more": has_more,
         "only_key": only_key,
         "period": period,
+        "summary_mode": summary_mode,
     }
 
     if request.headers.get("HX-Request") == "true":
