@@ -1,5 +1,3 @@
-from datetime import date, timedelta
-
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import desc
@@ -8,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.base import get_db
 from app.models.item import Item
 from app.web.deps import check_auth, templates
+from app.web.utils import since_utc
 
 router = APIRouter()
 
@@ -46,8 +45,7 @@ async def category_page(
     summary_mode = period in _PERIOD_DAYS
     if summary_mode:
         # Time-range summary: filter by date, sort by score descending
-        since = date.today() - timedelta(days=_PERIOD_DAYS[period] - 1)
-        query = query.filter(Item.fetched_at >= since)
+        query = query.filter(Item.fetched_at >= since_utc(_PERIOD_DAYS[period]))
         all_rows = query.order_by(desc(Item.score)).all()
     else:
         # Timeline mode: sort by fetched_at descending, paginate

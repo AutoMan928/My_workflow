@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.models.base import get_db
 from app.models.item import Item
 from app.web.deps import check_auth, templates
+from app.web.utils import cst_today
 
 router = APIRouter()
 
@@ -55,11 +56,13 @@ async def daily_report(
         try:
             report_date = date.fromisoformat(day)
         except ValueError:
-            report_date = date.today()
+            report_date = cst_today()
     else:
-        report_date = date.today()
+        report_date = cst_today()
 
-    next_day = report_date + timedelta(days=1)
+    # Convert CST date bounds to UTC for fetched_at comparison (stored as UTC)
+    report_utc_start = datetime.combine(report_date, datetime.min.time()) - timedelta(hours=8)
+    report_utc_end = report_utc_start + timedelta(hours=24)
 
     sections = []
     for slug, meta in _CATEGORY_META.items():
@@ -67,8 +70,8 @@ async def daily_report(
             db.query(Item)
             .filter(
                 Item.category_slug == slug,
-                Item.fetched_at >= report_date,
-                Item.fetched_at < next_day,
+                Item.fetched_at >= report_utc_start,
+                Item.fetched_at < report_utc_end,
             )
             .order_by(desc(Item.score))
             .limit(_TOP_N)
@@ -79,8 +82,8 @@ async def daily_report(
             db.query(Item)
             .filter(
                 Item.category_slug == slug,
-                Item.fetched_at >= report_date,
-                Item.fetched_at < next_day,
+                Item.fetched_at >= report_utc_start,
+                Item.fetched_at < report_utc_end,
             )
             .count()
         )
@@ -103,6 +106,6 @@ async def daily_report(
             "report_date": report_date,
             "has_content": has_content,
             "prev_date": (report_date - timedelta(days=1)).isoformat(),
-            "next_date": (report_date + timedelta(days=1)).isoformat() if report_date < date.today() else None,
+            "next_date": (report_date + timedelta(days=1)).isoformat() if report_date < cst_today() else None,
         },
     )
